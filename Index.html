@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda Fit 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts (Opcional, para mejor estilo) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Animaciones personalizadas similares a las de React */
+        .fade-in-up {
+            animation: fadeInUp 0.7s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Ocultar scrollbar en menú horizontal */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 relative">
+
+    <!-- 1. Banner Superior -->
+    <div class="w-full h-16 bg-gradient-to-r from-emerald-600 to-teal-500 flex items-center justify-center text-white overflow-hidden relative">
+        <div class="absolute inset-0 opacity-20" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+        <div class="z-10 flex items-center gap-2">
+            <i data-lucide="dumbbell" class="animate-pulse"></i>
+            <span class="font-bold tracking-wider text-lg">ENVÍOS GRATIS EN COMPRAS MAYORES A $999</span>
+        </div>
+    </div>
+
+    <!-- Navbar Principal -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <!-- LOGO IMAGEN -->
+                <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
+                     alt="Logo Fit" 
+                     class="h-12 w-12 rounded-full object-cover border-2 border-emerald-100">
+                
+                <!-- Título -->
+                <h1 class="text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
+            </div>
+            
+            <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <i data-lucide="shopping-cart" width="28" height="28"></i>
+                <span id="cart-count-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 2. Slider de Novedades -->
+    <div class="relative w-full h-[400px] bg-gray-200 overflow-hidden group">
+        <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
+            <!-- Slides inyectados por JS -->
+        </div>
+        
+        <!-- Controles Slider -->
+        <button onclick="moveSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+            <i data-lucide="chevron-left" width="32" height="32"></i>
+        </button>
+        <button onclick="moveSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+            <i data-lucide="chevron-right" width="32" height="32"></i>
+        </button>
+        
+        <!-- Indicadores -->
+        <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+    </div>
+
+    <!-- 3. Menú de Categorías -->
+    <div class="bg-white border-b border-gray-200 sticky top-[72px] z-30 shadow-sm overflow-x-auto no-scrollbar">
+        <div class="container mx-auto px-4 py-4">
+            <div id="categories-container" class="flex gap-4 md:justify-center min-w-max">
+                <!-- Categorías inyectadas por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Grid de Productos -->
+    <main class="container mx-auto px-4 py-12">
+        <h3 id="category-title" class="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2">
+            Catálogo Completo <span id="product-count" class="text-sm font-normal text-gray-500 ml-2"></span>
+        </h3>
+
+        <div id="products-container" class="space-y-12">
+            <!-- Productos y frases inyectados por JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <div>
+                    <div class="mb-4 inline-block">
+                        <div class="flex items-center gap-2">
+                           <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
+                                alt="Logo Fit" 
+                                class="h-10 w-10 rounded-full object-cover border border-gray-600">
+                           <span class="text-2xl font-bold flex items-center gap-2">TIENDA</span>
+                        </div>
+                     </div>
+                    <p class="text-gray-400">Tu compañero en el camino hacia una vida más saludable. Equipamiento, nutrición y estilo de vida en un solo lugar.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Enlaces Rápidos</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="hover:text-emerald-400 cursor-pointer">Sobre Nosotros</li>
+                        <li class="hover:text-emerald-400 cursor-pointer">Guía de Tallas</li>
+                        <li class="hover:text-emerald-400 cursor-pointer">Política de Devolución</li>
+                        <li class="hover:text-emerald-400 cursor-pointer">Contacto</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Boletín</h4>
+                    <p class="text-gray-400 mb-4">Recibe ofertas exclusivas y consejos fitness.</p>
+                    <div class="flex">
+                        <input type="email" placeholder="Tu correo" class="bg-gray-800 text-white px-4 py-2 rounded-l-lg focus:outline-none w-full border border-gray-700 focus:border-emerald-500">
+                        <button class="bg-emerald-600 px-4 py-2 rounded-r-lg hover:bg-emerald-500 font-bold">Suscribir</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">© 2026 Tienda Fit. Todos los derechos reservados.</p>
+                
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-400 text-sm">Métodos de Pago:</span>
+                    <div class="flex gap-2">
+                        <div class="bg-white text-blue-900 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300">VISA</div>
+                        <div class="bg-white text-orange-600 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300">Mastercard</div>
+                        <div class="bg-white text-blue-600 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300 font-serif italic">PayPal</div>
+                        <i data-lucide="credit-card" class="text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal del Carrito -->
+    <div id="cart-modal" class="hidden fixed inset-0 z-50">
+        <!-- Overlay -->
+        <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        <!-- Panel -->
+        <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col slide-in-right">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i data-lucide="shopping-cart" class="text-emerald-600"></i> Tu Carrito
+                </h2>
+                <button onclick="toggleCart(false)" class="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Items del carrito -->
+            </div>
+
+            <div id="cart-footer" class="p-6 border-t border-gray-100 bg-gray-50 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-lg font-medium text-gray-600">Total</span>
+                    <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
+                </div>
+                
+                <!-- Selección de Pago -->
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">Elige tu método de pago</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setPaymentMethod('card')" id="btn-card" class="p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative">
+                            <i data-lucide="credit-card" width="24" height="24"></i>
+                            <span class="text-sm font-bold">Tarjeta</span>
+                            <div id="check-card" class="absolute top-2 right-2 text-emerald-600 hidden"><i data-lucide="check-circle" width="16" height="16"></i></div>
+                        </button>
+                        
+                        <button onclick="setPaymentMethod('paypal')" id="btn-paypal" class="p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative">
+                            <span class="font-serif italic font-bold text-xl">PayPal</span>
+                            <span class="text-xs font-medium">Seguro</span>
+                            <div id="check-paypal" class="absolute top-2 right-2 text-blue-600 hidden"><i data-lucide="check-circle" width="16" height="16"></i></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botón de Pago -->
+                <button id="checkout-btn" onclick="handlePayment()" class="w-full py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex justify-center items-center gap-2">
+                     <!-- Texto dinámico -->
+                </button>
+
+                <p class="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
+                    <i data-lucide="sparkles" width="12" height="12"></i> Transacción 100% encriptada y segura
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA ---
+        const slides = [
+            { id: 1, title: "Nueva Colección 2026", subtitle: "Ropa técnica para alto rendimiento", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" },
+            { id: 2, title: "Suplementos Premium", subtitle: "Alimenta tus músculos con lo mejor", image: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" },
+            { id: 3, title: "Equipamiento Pro", subtitle: "Monta tu gimnasio en casa", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" }
+        ];
+
+        const categories = [
+            { name: 'Todas', icon: null },
+            { name: 'Novedades', icon: 'sparkles' },
+            { name: 'Ropa', icon: 'shirt' },
+            { name: 'Ejercicio', icon: 'dumbbell' },
+            { name: 'Alimentación', icon: 'apple' },
+            { name: 'Salud', icon: 'heart' },
+            { name: 'Higiene', icon: 'check' }
+        ];
+
+        const products = [
+            { id: 1, name: "Proteína Whey Gold", price: 1200, category: "Alimentación", image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=500&q=60" },
+            { id: 2, name: "Mancuernas 10kg", price: 850, category: "Ejercicio", image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?auto=format&fit=crop&w=500&q=60" },
+            { id: 3, name: "Tapete de Yoga Pro", price: 450, category: "Ejercicio", image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=500&q=60" },
+            { id: 4, name: "Multivitamínico", price: 350, category: "Salud", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=500&q=60" },
+            { id: 5, name: "Kit de Bandas", price: 300, category: "Novedades", image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=500&q=60" },
+            { id: 6, name: "Toalla Microfibra", price: 150, category: "Higiene", image: "https://images.unsplash.com/photo-1616611816278-3b960537f9f9?auto=format&fit=crop&w=500&q=60" },
+            { id: 7, name: "Botella Térmica", price: 280, category: "Novedades", image: "https://images.unsplash.com/photo-1602143407151-01114192008b?auto=format&fit=crop&w=500&q=60" },
+            { id: 8, name: "Monitor Cardíaco", price: 2500, category: "Salud", image: "https://images.unsplash.com/photo-1557166983-5939644443a0?auto=format&fit=crop&w=500&q=60" },
+            { id: 9, name: "Camiseta Dry-Fit", price: 450, category: "Ropa", image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=500&q=60" },
+            { id: 10, name: "Leggings Compresión", price: 600, category: "Ropa", image: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?auto=format&fit=crop&w=500&q=60" },
+            { id: 11, name: "Shorts Running", price: 380, category: "Ropa", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=500&q=60" },
+            { id: 12, name: "Sudadera Ligera", price: 890, category: "Ropa", image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=500&q=60" },
+        ];
+
+        const motivationalQuotes = [
+            "¡El dolor es debilidad saliendo de tu cuerpo!",
+            "Tu cuerpo puede con todo, es a tu mente a la que tienes que convencer.",
+            "No pares cuando estés cansado, para cuando hayas terminado.",
+            "La disciplina es el puente entre tus metas y tus logros.",
+            "Cada gota de sudor es un paso más cerca de tu mejor versión.",
+            "Invierte en ti mismo, es la mejor inversión que harás jamás."
+        ];
+
+        // --- STATE ---
+        let cart = [];
+        let activeCategory = 'Todas';
+        let currentSlide = 0;
+        let paymentMethod = 'card';
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSlider();
+            renderCategories();
+            renderProducts();
+            renderCart();
+            updatePaymentUI();
+            
+            // Auto slider
+            setInterval(() => moveSlide(1), 5000);
+            
+            // Initial Icons
+            lucide.createIcons();
+        });
+
+        // --- SLIDER LOGIC ---
+        function renderSlider() {
+            const track = document.getElementById('slider-track');
+            const indicators = document.getElementById('slider-indicators');
+            
+            track.innerHTML = slides.map(slide => `
+                <div class="min-w-full h-full relative">
+                    <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover brightness-75">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
+                        <h2 class="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">${slide.title}</h2>
+                        <p class="text-xl md:text-2xl mb-8 font-light drop-shadow-md">${slide.subtitle}</p>
+                        <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">
+                            Ver Ahora
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            indicators.innerHTML = slides.map((_, idx) => `
+                <button onclick="goToSlide(${idx})" class="w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-8' : 'bg-white/60'}"></button>
+            `).join('');
+            
+            updateSlidePosition();
+        }
+
+        function moveSlide(direction) {
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            updateSlidePosition();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlidePosition();
+        }
+
+        function updateSlidePosition() {
+            const track = document.getElementById('slider-track');
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Update indicators
+            const dots = document.getElementById('slider-indicators').children;
+            Array.from(dots).forEach((dot, idx) => {
+                dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-8' : 'bg-white/60'}`;
+            });
+        }
+
+        // --- CATEGORY LOGIC ---
+        function renderCategories() {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat.name}')" 
+                    class="flex items-center gap-2 px-6 py-2 rounded-full transition-all whitespace-nowrap font-medium cursor-pointer 
+                    ${activeCategory === cat.name 
+                        ? (cat.name === 'Todas' ? 'bg-gray-800 text-white' : 'bg-emerald-600 text-white shadow-md transform scale-105') 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                    ${cat.icon ? `<i data-lucide="${cat.icon}" width="18" height="18"></i>` : ''}
+                    ${cat.name}
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function setCategory(name) {
+            activeCategory = name;
+            renderCategories();
+            renderProducts();
+            
+            // Scroll to products
+            document.getElementById('category-title').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- PRODUCTS LOGIC ---
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            const title = document.getElementById('category-title');
+            const count = document.getElementById('product-count');
+
+            // Filter
+            const filtered = activeCategory === 'Todas' 
+                ? products 
+                : products.filter(p => p.category === activeCategory || (activeCategory === 'Novedades' && p.category === 'Novedades'));
+            
+            title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-sm font-normal text-gray-500 ml-2">(${filtered.length} productos)</span>`;
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría por el momento.</p></div>`;
+                return;
+            }
+
+            // Chunk Logic (Rows of 3)
+            const rows = [];
+            for (let i = 0; i < filtered.length; i += 3) {
+                rows.push(filtered.slice(i, i + 3));
+            }
+
+            container.innerHTML = rows.map((row, rowIndex) => `
+                <div class="fade-in-up" style="animation-delay: ${rowIndex * 100}ms">
+                    <div class="relative">
+                        <!-- Arrows -->
+                        <div class="absolute -left-8 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-left" width="48" height="48"></i></div>
+                        <div class="absolute -right-8 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-right" width="48" height="48"></i></div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                            ${row.map(product => `
+                                <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col">
+                                    <div class="h-64 overflow-hidden relative">
+                                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-bold text-gray-600 uppercase">
+                                            ${product.category}
+                                        </div>
+                                    </div>
+                                    <div class="p-5 flex flex-col flex-1">
+                                        <h4 class="text-lg font-bold text-gray-800 mb-2 truncate">${product.name}</h4>
+                                        <div class="mt-auto flex justify-between items-center">
+                                            <span class="text-2xl font-bold text-emerald-600">$${product.price}</span>
+                                            <button onclick="addToCart(${product.id})" class="bg-gray-900 hover:bg-emerald-600 text-white p-3 rounded-lg transition-colors flex items-center justify-center cursor-pointer">
+                                                <i data-lucide="shopping-cart" width="18" height="18" class="mr-2"></i> Agregar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Quote -->
+                    <div class="mt-8 relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-6 flex items-center justify-center">
+                        <div class="absolute top-0 right-0 -mt-2 -mr-2 text-emerald-100 opacity-50">
+                            <i data-lucide="flame" width="64" height="64"></i>
+                        </div>
+                        <p class="text-center font-bold italic text-emerald-800 text-lg md:text-xl relative z-10 flex items-center gap-3">
+                            <span class="text-emerald-400 text-4xl leading-none">"</span>
+                            ${motivationalQuotes[rowIndex % motivationalQuotes.length]}
+                            <span class="text-emerald-400 text-4xl leading-none">"</span>
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+
+        // --- CART LOGIC ---
+        function toggleCart(show) {
+            const modal = document.getElementById('cart-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+                renderCart();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                cart.push(product);
+                updateCartBadge();
+                renderCart();
+                toggleCart(true);
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartBadge();
+            renderCart();
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-count-badge');
+            if (cart.length > 0) {
+                badge.textContent = cart.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+            const totalEl = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 mt-20">
+                        <div class="flex justify-center mb-4"><i data-lucide="dumbbell" width="64" height="64" class="text-gray-300"></i></div>
+                        <p class="text-lg font-medium">Tu carrito está vacío</p>
+                        <p class="text-sm">¡Empieza a añadir equipo!</p>
+                        <button onclick="toggleCart(false)" class="mt-6 text-emerald-600 font-bold hover:underline">Volver a la tienda</button>
+                    </div>
+                `;
+                footer.classList.add('hidden');
+            } else {
+                container.innerHTML = cart.map((item, index) => `
+                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl items-center shadow-sm">
+                        <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            <p class="text-sm text-gray-500">${item.category}</p>
+                            <p class="text-emerald-600 font-bold mt-1">$${item.price}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors">
+                            <i data-lucide="x" width="20" height="20"></i>
+                        </button>
+                    </div>
+                `).join('');
+                
+                const total = cart.reduce((acc, item) => acc + item.price, 0);
+                totalEl.textContent = `$${total}`;
+                footer.classList.remove('hidden');
+            }
+            lucide.createIcons();
+            updatePaymentUI();
+        }
+
+        // --- PAYMENT LOGIC ---
+        function setPaymentMethod(method) {
+            paymentMethod = method;
+            updatePaymentUI();
+        }
+
+        function updatePaymentUI() {
+            const btnCard = document.getElementById('btn-card');
+            const btnPaypal = document.getElementById('btn-paypal');
+            const checkCard = document.getElementById('check-card');
+            const checkPaypal = document.getElementById('check-paypal');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            // Reset styles
+            btnCard.className = "p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative cursor-pointer " + (paymentMethod === 'card' ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-gray-200 text-gray-500 hover:bg-gray-50');
+            btnPaypal.className = "p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative cursor-pointer " + (paymentMethod === 'paypal' ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-gray-200 text-gray-500 hover:bg-gray-50');
+
+            if (paymentMethod === 'card') {
+                checkCard.classList.remove('hidden');
+                checkPaypal.classList.add('hidden');
+                checkoutBtn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-500/30 flex justify-center items-center gap-2 cursor-pointer";
+                checkoutBtn.innerHTML = `Pagar con Tarjeta <i data-lucide="credit-card" width="20" height="20"></i>`;
+            } else {
+                checkCard.classList.add('hidden');
+                checkPaypal.classList.remove('hidden');
+                checkoutBtn.className = "w-full bg-[#FFC439] text-[#003087] py-4 rounded-xl font-bold text-lg hover:brightness-105 transition-all shadow-md flex justify-center items-center gap-2 cursor-pointer";
+                checkoutBtn.innerHTML = `Pagar con <span class="italic font-bold">PayPal</span>`;
+            }
+            lucide.createIcons();
+        }
+
+        function handlePayment() {
+            const total = cart.reduce((acc, item) => acc + item.price, 0);
+            if (paymentMethod === 'card') {
+                alert(`Procesando pago con TARJETA por $${total}. \n\n¡Gracias por tu compra!`);
+            } else {
+                const confirmPay = confirm(`Estás siendo redirigido a PayPal para pagar $${total}.\n\n¿Continuar?`);
+                if (confirmPay) {
+                    alert("Pago exitoso vía PayPal. ¡Gracias!");
+                } else {
+                    return;
+                }
+            }
+            cart = [];
+            updateCartBadge();
+            renderCart();
+            toggleCart(false);
+        }
+    </script>
+</body>
+</html>
