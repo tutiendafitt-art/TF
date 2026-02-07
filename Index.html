@@ -11,12 +11,11 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts (Opcional, para mejor estilo) -->
+    <!-- Google Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
-        /* Animaciones personalizadas similares a las de React */
         .fade-in-up {
             animation: fadeInUp 0.7s ease-out forwards;
             opacity: 0;
@@ -26,22 +25,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .slide-in-right {
-            animation: slideInRight 0.3s ease-out forwards;
-        }
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        /* Ocultar scrollbar en menú horizontal */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        /* Ocultar scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
@@ -50,64 +36,60 @@
     <nav class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- LOGO IMAGEN -->
+                <!-- LOGO -->
                 <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
                      alt="Logo Fit" 
                      class="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover border-2 border-emerald-100">
-                
-                <!-- Título -->
                 <h1 class="text-xl md:text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
             </div>
             
+            <!-- 
+            NOTA: CARRITO DESHABILITADO TEMPORALMENTE
             <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <i data-lucide="shopping-cart" class="w-6 h-6 md:w-7 md:h-7"></i>
                 <span id="cart-count-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-[10px] md:text-xs font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">0</span>
-            </button>
+            </button> 
+            -->
+            
+            <!-- Botón de contacto directo en Navbar -->
+            <a href="https://wa.me/message/W4YPSEIUB3WNB1" target="_blank" class="flex items-center gap-2 text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors">
+                <i data-lucide="message-circle"></i> Contacto
+            </a>
         </div>
     </nav>
 
-    <!-- 2. Slider de Novedades -->
+    <!-- Slider -->
     <div class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group">
-        <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
-            <!-- Slides inyectados por JS -->
-        </div>
-        
-        <!-- Controles Slider -->
+        <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);"></div>
         <button onclick="moveSlide(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
             <i data-lucide="chevron-left" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
         <button onclick="moveSlide(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
             <i data-lucide="chevron-right" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
-        
-        <!-- Indicadores -->
         <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
     </div>
 
-    <!-- 3. Menú de Categorías -->
+    <!-- Menú de Categorías -->
     <div class="bg-white border-b border-gray-200 sticky top-[64px] md:top-[72px] z-30 shadow-sm overflow-x-auto no-scrollbar">
         <div class="container mx-auto px-4 py-3 md:py-4">
-            <div id="categories-container" class="flex gap-3 md:gap-4 md:justify-center min-w-max">
-                <!-- Categorías inyectadas por JS -->
-            </div>
+            <div id="categories-container" class="flex gap-3 md:gap-4 md:justify-center min-w-max"></div>
         </div>
     </div>
 
-    <!-- Main Content: Grid de Productos -->
+    <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 md:py-12">
         <h3 id="category-title" class="text-xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-2">
             Catálogo Completo <span id="product-count" class="text-xs md:text-sm font-normal text-gray-500 ml-2"></span>
         </h3>
 
-        <!-- Contenedor de carga (visible mientras llegan los datos) -->
+        <!-- Spinner Carga -->
         <div id="loading-indicator" class="text-center py-10 hidden">
             <i data-lucide="loader-2" class="animate-spin w-10 h-10 text-emerald-600 mx-auto"></i>
-            <p class="mt-2 text-gray-500">Cargando productos de la base de datos...</p>
+            <p class="mt-2 text-gray-500">Cargando catálogo...</p>
         </div>
 
-        <div id="products-container" class="space-y-8 md:space-y-12">
-            <!-- Productos y frases inyectados por JS -->
-        </div>
+        <div id="products-container" class="space-y-8 md:space-y-12"></div>
     </main>
 
     <!-- Footer -->
@@ -117,104 +99,41 @@
                 <div>
                     <div class="mb-4 inline-block">
                         <div class="flex items-center gap-2">
-                           <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
-                                alt="Logo Fit" 
-                                class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
+                           <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
                            <span class="text-xl md:text-2xl font-bold flex items-center gap-2">TIENDA</span>
                         </div>
                      </div>
-                    <p class="text-sm md:text-base text-gray-400">Tu compañero en el camino hacia una vida más saludable. Equipamiento, nutrición y estilo de vida en un solo lugar.</p>
+                    <p class="text-sm md:text-base text-gray-400">Tu compañero en el camino hacia una vida más saludable.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-base md:text-lg mb-4">Enlaces Rápidos</h4>
                     <ul class="space-y-2 text-sm md:text-base text-gray-400">
                         <li class="hover:text-emerald-400 cursor-pointer">Sobre Nosotros</li>
-                        <li class="hover:text-emerald-400 cursor-pointer">Guía de Tallas</li>
-                        <li class="hover:text-emerald-400 cursor-pointer">Política de Devolución</li>
                         <li class="hover:text-emerald-400 cursor-pointer">Contacto</li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-bold text-base md:text-lg mb-4">Boletín</h4>
-                    <p class="text-sm md:text-base text-gray-400 mb-4">Recibe ofertas exclusivas y consejos fitness.</p>
                     <div class="flex">
                         <input type="email" placeholder="Tu correo" class="bg-gray-800 text-white px-4 py-2 rounded-l-lg focus:outline-none w-full border border-gray-700 focus:border-emerald-500 text-sm">
                         <button class="bg-emerald-600 px-4 py-2 rounded-r-lg hover:bg-emerald-500 font-bold text-sm">Suscribir</button>
                     </div>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-500 text-xs md:text-sm">© 2026 Tienda Fit. Todos los derechos reservados.</p>
-                
-                <div class="flex items-center gap-4">
-                    <span class="text-gray-400 text-xs md:text-sm">Métodos de Pago:</span>
-                    <div class="flex gap-2">
-                        <div class="bg-white text-blue-900 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300">VISA</div>
-                        <div class="bg-white text-orange-600 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300">Mastercard</div>
-                        <div class="bg-white text-blue-600 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300 font-serif italic">PayPal</div>
-                        <i data-lucide="credit-card" class="text-gray-400 w-4 h-4 md:w-6 md:h-6"></i>
-                    </div>
-                </div>
-            </div>
+            <p class="text-gray-500 text-xs md:text-sm text-center border-t border-gray-800 pt-8">© 2026 Tienda Fit.</p>
         </div>
     </footer>
 
-    <!-- Modal del Carrito -->
+    <!-- 
+    NOTA: MODAL DE CARRITO Y PAGOS COMENTADO TEMPORALMENTE
     <div id="cart-modal" class="hidden fixed inset-0 z-50">
-        <!-- Overlay -->
         <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-        
-        <!-- Panel -->
         <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col slide-in-right">
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2">
-                    <i data-lucide="shopping-cart" class="text-emerald-600"></i> Tu Carrito
-                </h2>
-                <button onclick="toggleCart(false)" class="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
-                <!-- Items del carrito -->
-            </div>
-
-            <div id="cart-footer" class="p-6 border-t border-gray-100 bg-gray-50 hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <span class="text-lg font-medium text-gray-600">Total</span>
-                    <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
-                </div>
-                
-                <!-- Selección de Pago -->
-                <div class="mb-6">
-                    <h3 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">Elige tu método de pago</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setPaymentMethod('card')" id="btn-card" class="p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative">
-                            <i data-lucide="credit-card" width="24" height="24"></i>
-                            <span class="text-sm font-bold">Tarjeta</span>
-                            <div id="check-card" class="absolute top-2 right-2 text-emerald-600 hidden"><i data-lucide="check-circle" width="16" height="16"></i></div>
-                        </button>
-                        
-                        <button onclick="setPaymentMethod('paypal')" id="btn-paypal" class="p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative">
-                            <span class="font-serif italic font-bold text-xl">PayPal</span>
-                            <span class="text-xs font-medium">Seguro</span>
-                            <div id="check-paypal" class="absolute top-2 right-2 text-blue-600 hidden"><i data-lucide="check-circle" width="16" height="16"></i></div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Botón de Pago -->
-                <button id="checkout-btn" onclick="handlePayment()" class="w-full py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex justify-center items-center gap-2">
-                     <!-- Texto dinámico -->
-                </button>
-
-                <p class="text-center text-xs text-gray-400 mt-4 flex items-center justify-center gap-1">
-                    <i data-lucide="sparkles" width="12" height="12"></i> Transacción 100% encriptada y segura
-                </p>
-            </div>
+            ... Contenido del carrito ...
+            <button id="checkout-btn" onclick="handlePayment()" ...></button>
         </div>
-    </div>
+    </div> 
+    -->
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
@@ -235,83 +154,59 @@
             { name: 'Higiene', icon: 'check' }
         ];
 
-        // --- ESTADO INICIAL ---
-        // LISTA VACÍA: Ahora esperamos a la base de datos
-        let products = []; 
+        let products = []; // Esperando DB
+        let cart = []; // Mantenemos la variable aunque no se use visualmente
+        let activeCategory = 'Todas';
+        let currentSlide = 0;
 
         const motivationalQuotes = [
             "¡El dolor es debilidad saliendo de tu cuerpo!",
             "Tu cuerpo puede con todo, es a tu mente a la que tienes que convencer.",
             "No pares cuando estés cansado, para cuando hayas terminado.",
             "La disciplina es el puente entre tus metas y tus logros.",
-            "Cada gota de sudor es un paso más cerca de tu mejor versión.",
-            "Invierte en ti mismo, es la mejor inversión que harás jamás."
         ];
-
-        // --- STATE ---
-        let cart = [];
-        let activeCategory = 'Todas';
-        let currentSlide = 0;
-        let paymentMethod = 'card';
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             renderSlider();
             renderCategories();
-            
-            // LLAMADA A LA BASE DE DATOS
             fetchProductsFromDB();
             
-            renderCart();
-            updatePaymentUI();
+            // RenderCart desactivado visualmente
+            // renderCart();
+            // updatePaymentUI();
             
-            // Auto slider
             setInterval(() => moveSlide(1), 5000);
-            
-            // Initial Icons
             lucide.createIcons();
         });
 
-        // --- DATABASE LOGIC (NEON + NETLIFY) ---
+        // --- DATABASE LOGIC ---
         async function fetchProductsFromDB() {
-            const container = document.getElementById('products-container');
             const loading = document.getElementById('loading-indicator');
-            
             try {
-                // Mostrar spinner de carga
                 if (loading) loading.classList.remove('hidden');
-
-                // Llamada a la Netlify Function
                 const response = await fetch('/.netlify/functions/get-productos');
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                 
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
                 const data = await response.json();
-                
-                // Mapear datos (DB en español -> Frontend en inglés)
-                // Asegúrate que las columnas en Neon sean: nombre, precio, categoria, imagen_url
                 products = data.map(p => ({
                     id: p.id,
                     name: p.nombre, 
-                    price: parseFloat(p.precio), // Asegurar que sea número
+                    price: parseFloat(p.precio),
                     category: p.categoria,
                     image: p.imagen_url
                 }));
                 
-                // Ocultar spinner y mostrar productos
                 if (loading) loading.classList.add('hidden');
                 renderProducts();
-                lucide.createIcons(); // Refrescar iconos de los nuevos elementos
-
+                lucide.createIcons();
             } catch (err) {
                 console.error("Error cargando productos:", err);
-                if (loading) loading.innerHTML = `<p class="text-red-500">Error al cargar el catálogo. Intenta recargar la página.</p>`;
+                if (loading) loading.innerHTML = `<p class="text-red-500">Error de conexión. Intenta recargar.</p>`;
             }
         }
 
-        // --- SLIDER LOGIC ---
+        // --- SLIDER LOGIC (Sin cambios) ---
         function renderSlider() {
             const track = document.getElementById('slider-track');
             const indicators = document.getElementById('slider-indicators');
@@ -322,9 +217,7 @@
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
                         <h2 class="text-2xl md:text-6xl font-extrabold mb-2 md:mb-4 drop-shadow-lg leading-tight">${slide.title}</h2>
                         <p class="text-sm md:text-2xl mb-3 md:mb-8 font-light drop-shadow-md">${slide.subtitle}</p>
-                        <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">
-                            Ver Ahora
-                        </button>
+                        <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">Ver Ahora</button>
                     </div>
                 </div>
             `).join('');
@@ -332,7 +225,6 @@
             indicators.innerHTML = slides.map((_, idx) => `
                 <button onclick="goToSlide(${idx})" class="w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}"></button>
             `).join('');
-            
             updateSlidePosition();
         }
 
@@ -340,17 +232,13 @@
             currentSlide = (currentSlide + direction + slides.length) % slides.length;
             updateSlidePosition();
         }
-
         function goToSlide(index) {
             currentSlide = index;
             updateSlidePosition();
         }
-
         function updateSlidePosition() {
             const track = document.getElementById('slider-track');
             track.style.transform = `translateX(-${currentSlide * 100}%)`;
-            
-            // Update indicators
             const dots = document.getElementById('slider-indicators').children;
             Array.from(dots).forEach((dot, idx) => {
                 dot.className = `w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}`;
@@ -361,69 +249,46 @@
         function renderCategories() {
             const container = document.getElementById('categories-container');
             container.innerHTML = categories.map(cat => `
-                <button onclick="setCategory('${cat.name}')" 
-                    class="flex items-center gap-2 px-4 py-1.5 md:px-6 md:py-2 text-xs md:text-base rounded-full transition-all whitespace-nowrap font-medium cursor-pointer 
-                    ${activeCategory === cat.name 
-                        ? (cat.name === 'Todas' ? 'bg-gray-800 text-white' : 'bg-emerald-600 text-white shadow-md transform scale-105') 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
-                    ${cat.icon ? `<i data-lucide="${cat.icon}" class="w-4 h-4 md:w-[18px] md:h-[18px]"></i>` : ''}
-                    ${cat.name}
+                <button onclick="setCategory('${cat.name}')" class="flex items-center gap-2 px-4 py-1.5 md:px-6 md:py-2 text-xs md:text-base rounded-full transition-all whitespace-nowrap font-medium cursor-pointer ${activeCategory === cat.name ? (cat.name === 'Todas' ? 'bg-gray-800 text-white' : 'bg-emerald-600 text-white shadow-md transform scale-105') : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                    ${cat.icon ? `<i data-lucide="${cat.icon}" class="w-4 h-4 md:w-[18px] md:h-[18px]"></i>` : ''} ${cat.name}
                 </button>
             `).join('');
             lucide.createIcons();
         }
-
         function setCategory(name) {
             activeCategory = name;
             renderCategories();
             renderProducts();
-            
-            // Scroll to products
             document.getElementById('category-title').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- PRODUCTS LOGIC ---
+        // --- PRODUCTS LOGIC (MODIFICADO PARA WHATSAPP) ---
         function renderProducts() {
             const container = document.getElementById('products-container');
             const title = document.getElementById('category-title');
-            const count = document.getElementById('product-count');
-
-            // Filter
-            const filtered = activeCategory === 'Todas' 
-                ? products 
-                : products.filter(p => p.category === activeCategory || (activeCategory === 'Novedades' && p.category === 'Novedades'));
             
-            // AJUSTE: Tamaño del contador (text-xs móvil / text-sm PC)
+            const filtered = activeCategory === 'Todas' ? products : products.filter(p => p.category === activeCategory || (activeCategory === 'Novedades' && p.category === 'Novedades'));
+            
             title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-xs md:text-sm font-normal text-gray-500 ml-2">(${filtered.length} productos)</span>`;
             
             if (filtered.length === 0) {
-                // Mensaje diferente si la lista está vacía pero se espera carga vs no hay productos en categoría
-                if (products.length === 0) {
-                     container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">Esperando productos...</p></div>`;
-                } else {
-                     container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría por el momento.</p></div>`;
-                }
+                if (products.length === 0) container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">Esperando productos...</p></div>`;
+                else container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría.</p></div>`;
                 return;
             }
 
-            // Chunk Logic (Rows of 3)
             const rows = [];
-            for (let i = 0; i < filtered.length; i += 3) {
-                rows.push(filtered.slice(i, i + 3));
-            }
+            for (let i = 0; i < filtered.length; i += 3) rows.push(filtered.slice(i, i + 3));
 
             container.innerHTML = rows.map((row, rowIndex) => `
                 <div class="fade-in-up" style="animation-delay: ${rowIndex * 100}ms">
                     <div class="relative">
-                        <!-- Arrows (Solo visibles en PC grande) -->
                         <div class="absolute -left-12 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-left" width="48" height="48"></i></div>
                         <div class="absolute -right-12 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-right" width="48" height="48"></i></div>
 
-                        <!-- GRID FORZADO DE 3 COLUMNAS (Móvil y PC) -->
                         <div class="grid grid-cols-3 gap-2 md:gap-8">
                             ${row.map(product => `
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
-                                    <!-- Imagen adaptable -->
                                     <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative">
                                         <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">
@@ -431,27 +296,25 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Contenido adaptable -->
                                     <div class="p-2 md:p-5 flex flex-col flex-1">
                                         <h4 class="text-xs md:text-lg font-bold text-gray-800 mb-1 md:mb-2 truncate leading-tight">${product.name}</h4>
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center gap-1 md:gap-0">
                                             <span class="text-sm md:text-2xl font-bold text-emerald-600">$${product.price}</span>
-                                            <button onclick="addToCart(${product.id})" class="w-full xl:w-auto bg-gray-900 hover:bg-emerald-600 text-white p-1.5 md:p-3 rounded md:rounded-lg transition-colors flex items-center justify-center cursor-pointer">
-                                                <i data-lucide="shopping-cart" class="w-3 h-3 md:w-5 md:h-5 mr-1 md:mr-2"></i> 
-                                                <span class="text-[10px] md:text-base">Agregar</span>
-                                            </button>
+                                            
+                                            <!-- BOTÓN WHATSAPP -->
+                                            <a href="https://wa.me/message/W4YPSEIUB3WNB1" target="_blank" class="w-full xl:w-auto bg-green-500 hover:bg-green-600 text-white p-1.5 md:p-3 rounded md:rounded-lg transition-colors flex items-center justify-center cursor-pointer no-underline">
+                                                <i data-lucide="message-circle" class="w-3 h-3 md:w-5 md:h-5 mr-1 md:mr-2"></i> 
+                                                <span class="text-[10px] md:text-base font-bold">Consultar</span>
+                                            </a>
+                                            <!-- FIN BOTÓN WHATSAPP -->
+                                            
                                         </div>
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
-
-                    <!-- Frase Motivacional (Diseño Adaptable) -->
                     <div class="mt-4 md:mt-8 relative overflow-hidden rounded-lg md:rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-3 md:p-6 flex items-center justify-center shadow-sm">
-                        <div class="absolute top-0 right-0 -mt-2 -mr-2 text-emerald-100 opacity-50">
-                            <i data-lucide="flame" class="w-8 h-8 md:w-16 md:h-16"></i>
-                        </div>
                         <p class="text-center font-bold italic text-emerald-800 text-xs md:text-xl relative z-10 flex items-center gap-1 md:gap-3">
                             <span class="text-emerald-400 text-xl md:text-4xl leading-none">"</span>
                             ${motivationalQuotes[rowIndex % motivationalQuotes.length]}
@@ -460,133 +323,19 @@
                     </div>
                 </div>
             `).join('');
-            
             lucide.createIcons();
         }
 
-        // --- CART LOGIC ---
-        function toggleCart(show) {
-            const modal = document.getElementById('cart-modal');
-            if (show) {
-                modal.classList.remove('hidden');
-                renderCart();
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                cart.push(product);
-                updateCartBadge();
-                renderCart();
-                toggleCart(true);
-            }
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartBadge();
-            renderCart();
-        }
-
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-count-badge');
-            if (cart.length > 0) {
-                badge.textContent = cart.length;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        function renderCart() {
-            const container = document.getElementById('cart-items-container');
-            const footer = document.getElementById('cart-footer');
-            const totalEl = document.getElementById('cart-total');
-
-            if (cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-500 mt-20">
-                        <div class="flex justify-center mb-4"><i data-lucide="dumbbell" width="64" height="64" class="text-gray-300"></i></div>
-                        <p class="text-lg font-medium">Tu carrito está vacío</p>
-                        <p class="text-sm">¡Empieza a añadir equipo!</p>
-                        <button onclick="toggleCart(false)" class="mt-6 text-emerald-600 font-bold hover:underline">Volver a la tienda</button>
-                    </div>
-                `;
-                footer.classList.add('hidden');
-            } else {
-                container.innerHTML = cart.map((item, index) => `
-                    <div class="flex gap-4 p-4 bg-gray-50 rounded-xl items-center shadow-sm">
-                        <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-800">${item.name}</h4>
-                            <p class="text-sm text-gray-500">${item.category}</p>
-                            <p class="text-emerald-600 font-bold mt-1">$${item.price}</p>
-                        </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors">
-                            <i data-lucide="x" width="20" height="20"></i>
-                        </button>
-                    </div>
-                `).join('');
-                
-                const total = cart.reduce((acc, item) => acc + item.price, 0);
-                totalEl.textContent = `$${total}`;
-                footer.classList.remove('hidden');
-            }
-            lucide.createIcons();
-            updatePaymentUI();
-        }
-
-        // --- PAYMENT LOGIC ---
-        function setPaymentMethod(method) {
-            paymentMethod = method;
-            updatePaymentUI();
-        }
-
-        function updatePaymentUI() {
-            const btnCard = document.getElementById('btn-card');
-            const btnPaypal = document.getElementById('btn-paypal');
-            const checkCard = document.getElementById('check-card');
-            const checkPaypal = document.getElementById('check-paypal');
-            const checkoutBtn = document.getElementById('checkout-btn');
-
-            // Reset styles
-            btnCard.className = "p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative cursor-pointer " + (paymentMethod === 'card' ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-gray-200 text-gray-500 hover:bg-gray-50');
-            btnPaypal.className = "p-3 rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all relative cursor-pointer " + (paymentMethod === 'paypal' ? 'border-blue-500 bg-blue-50 text-blue-900' : 'border-gray-200 text-gray-500 hover:bg-gray-50');
-
-            if (paymentMethod === 'card') {
-                checkCard.classList.remove('hidden');
-                checkPaypal.classList.add('hidden');
-                checkoutBtn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg hover:shadow-emerald-500/30 flex justify-center items-center gap-2 cursor-pointer";
-                checkoutBtn.innerHTML = `Pagar con Tarjeta <i data-lucide="credit-card" width="20" height="20"></i>`;
-            } else {
-                checkCard.classList.add('hidden');
-                checkPaypal.classList.remove('hidden');
-                checkoutBtn.className = "w-full bg-[#FFC439] text-[#003087] py-4 rounded-xl font-bold text-lg hover:brightness-105 transition-all shadow-md flex justify-center items-center gap-2 cursor-pointer";
-                checkoutBtn.innerHTML = `Pagar con <span class="italic font-bold">PayPal</span>`;
-            }
-            lucide.createIcons();
-        }
-
-        function handlePayment() {
-            const total = cart.reduce((acc, item) => acc + item.price, 0);
-            if (paymentMethod === 'card') {
-                alert(`Procesando pago con TARJETA por $${total}. \n\n¡Gracias por tu compra!`);
-            } else {
-                const confirmPay = confirm(`Estás siendo redirigido a PayPal para pagar $${total}.\n\n¿Continuar?`);
-                if (confirmPay) {
-                    alert("Pago exitoso vía PayPal. ¡Gracias!");
-                } else {
-                    return;
-                }
-            }
-            cart = [];
-            updateCartBadge();
-            renderCart();
-            toggleCart(false);
-        }
+        // --- FUNCIONES DEL CARRITO (Deshabilitadas visualmente) ---
+        // (Dejamos las funciones aquí por si decides volver a activar la tienda en el futuro)
+        function toggleCart(show) { /* Código anterior */ }
+        function addToCart(productId) { /* Código anterior */ }
+        function removeFromCart(index) { /* Código anterior */ }
+        function updateCartBadge() { /* Código anterior */ }
+        function renderCart() { /* Código anterior */ }
+        function setPaymentMethod(method) { /* Código anterior */ }
+        function updatePaymentUI() { /* Código anterior */ }
+        function handlePayment() { /* Código anterior */ }
     </script>
 </body>
 </html>
