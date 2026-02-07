@@ -67,7 +67,6 @@
     </nav>
 
     <!-- 2. Slider de Novedades -->
-    <!-- AJUSTE: h-56 (móvil) y md:h-[400px] (PC) para mantener proporción rectangular -->
     <div class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group">
         <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
             <!-- Slides inyectados por JS -->
@@ -96,10 +95,15 @@
 
     <!-- Main Content: Grid de Productos -->
     <main class="container mx-auto px-4 py-8 md:py-12">
-        <!-- AJUSTE: Título responsivo (text-xl en móvil, text-3xl en PC) -->
         <h3 id="category-title" class="text-xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-2">
             Catálogo Completo <span id="product-count" class="text-xs md:text-sm font-normal text-gray-500 ml-2"></span>
         </h3>
+
+        <!-- Contenedor de carga (visible mientras llegan los datos) -->
+        <div id="loading-indicator" class="text-center py-10 hidden">
+            <i data-lucide="loader-2" class="animate-spin w-10 h-10 text-emerald-600 mx-auto"></i>
+            <p class="mt-2 text-gray-500">Cargando productos de la base de datos...</p>
+        </div>
 
         <div id="products-container" class="space-y-8 md:space-y-12">
             <!-- Productos y frases inyectados por JS -->
@@ -231,29 +235,9 @@
             { name: 'Higiene', icon: 'check' }
         ];
 
-       // Empezamos con la lista vacía
+        // --- ESTADO INICIAL ---
+        // LISTA VACÍA: Ahora esperamos a la base de datos
         let products = []; 
-
-        // Esta función va a buscar los datos a la DB
-        async function fetchProductsFromDB() {
-            try {
-                const response = await fetch('/.netlify/functions/get-productos');
-                const data = await response.json();
-                
-                // Mapeamos los nombres de la DB a los que usa tu diseño
-                products = data.map(p => ({
-                    id: p.id,
-                    name: p.nombre,
-                    price: p.precio,
-                    category: p.categoria,
-                    image: p.imagen_url
-                }));
-                
-                renderProducts(); // Dibujamos la tienda con los datos nuevos
-            } catch (err) {
-                console.error("Error cargando productos:", err);
-            }
-        }
 
         const motivationalQuotes = [
             "¡El dolor es debilidad saliendo de tu cuerpo!",
@@ -274,7 +258,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderSlider();
             renderCategories();
-            renderProducts();
+            
+            // LLAMADA A LA BASE DE DATOS
+            fetchProductsFromDB();
+            
             renderCart();
             updatePaymentUI();
             
@@ -285,6 +272,45 @@
             lucide.createIcons();
         });
 
+        // --- DATABASE LOGIC (NEON + NETLIFY) ---
+        async function fetchProductsFromDB() {
+            const container = document.getElementById('products-container');
+            const loading = document.getElementById('loading-indicator');
+            
+            try {
+                // Mostrar spinner de carga
+                if (loading) loading.classList.remove('hidden');
+
+                // Llamada a la Netlify Function
+                const response = await fetch('/.netlify/functions/get-productos');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Mapear datos (DB en español -> Frontend en inglés)
+                // Asegúrate que las columnas en Neon sean: nombre, precio, categoria, imagen_url
+                products = data.map(p => ({
+                    id: p.id,
+                    name: p.nombre, 
+                    price: parseFloat(p.precio), // Asegurar que sea número
+                    category: p.categoria,
+                    image: p.imagen_url
+                }));
+                
+                // Ocultar spinner y mostrar productos
+                if (loading) loading.classList.add('hidden');
+                renderProducts();
+                lucide.createIcons(); // Refrescar iconos de los nuevos elementos
+
+            } catch (err) {
+                console.error("Error cargando productos:", err);
+                if (loading) loading.innerHTML = `<p class="text-red-500">Error al cargar el catálogo. Intenta recargar la página.</p>`;
+            }
+        }
+
         // --- SLIDER LOGIC ---
         function renderSlider() {
             const track = document.getElementById('slider-track');
@@ -294,7 +320,6 @@
                 <div class="min-w-full h-full relative">
                     <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover brightness-75">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-                        <!-- AJUSTE: Textos responsivos (text-2xl móvil / text-6xl PC) -->
                         <h2 class="text-2xl md:text-6xl font-extrabold mb-2 md:mb-4 drop-shadow-lg leading-tight">${slide.title}</h2>
                         <p class="text-sm md:text-2xl mb-3 md:mb-8 font-light drop-shadow-md">${slide.subtitle}</p>
                         <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">
@@ -372,7 +397,12 @@
             title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-xs md:text-sm font-normal text-gray-500 ml-2">(${filtered.length} productos)</span>`;
             
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría por el momento.</p></div>`;
+                // Mensaje diferente si la lista está vacía pero se espera carga vs no hay productos en categoría
+                if (products.length === 0) {
+                     container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">Esperando productos...</p></div>`;
+                } else {
+                     container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría por el momento.</p></div>`;
+                }
                 return;
             }
 
@@ -560,4 +590,3 @@
     </script>
 </body>
 </html>
-
