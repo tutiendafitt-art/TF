@@ -53,31 +53,32 @@
                 <!-- LOGO IMAGEN -->
                 <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
                      alt="Logo Fit" 
-                     class="h-12 w-12 rounded-full object-cover border-2 border-emerald-100">
+                     class="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover border-2 border-emerald-100">
                 
                 <!-- Título -->
-                <h1 class="text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
+                <h1 class="text-xl md:text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
             </div>
             
             <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <i data-lucide="shopping-cart" width="28" height="28"></i>
-                <span id="cart-count-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                <i data-lucide="shopping-cart" class="w-6 h-6 md:w-7 md:h-7"></i>
+                <span id="cart-count-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-[10px] md:text-xs font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">0</span>
             </button>
         </div>
     </nav>
 
     <!-- 2. Slider de Novedades -->
-    <div class="relative w-full h-[400px] bg-gray-200 overflow-hidden group">
+    <!-- AJUSTE: h-56 (móvil) y md:h-[400px] (PC) para mantener proporción rectangular -->
+    <div class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group">
         <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
             <!-- Slides inyectados por JS -->
         </div>
         
         <!-- Controles Slider -->
-        <button onclick="moveSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-            <i data-lucide="chevron-left" width="32" height="32"></i>
+        <button onclick="moveSlide(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+            <i data-lucide="chevron-left" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
-        <button onclick="moveSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-            <i data-lucide="chevron-right" width="32" height="32"></i>
+        <button onclick="moveSlide(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+            <i data-lucide="chevron-right" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
         
         <!-- Indicadores -->
@@ -85,43 +86,44 @@
     </div>
 
     <!-- 3. Menú de Categorías -->
-    <div class="bg-white border-b border-gray-200 sticky top-[72px] z-30 shadow-sm overflow-x-auto no-scrollbar">
-        <div class="container mx-auto px-4 py-4">
-            <div id="categories-container" class="flex gap-4 md:justify-center min-w-max">
+    <div class="bg-white border-b border-gray-200 sticky top-[64px] md:top-[72px] z-30 shadow-sm overflow-x-auto no-scrollbar">
+        <div class="container mx-auto px-4 py-3 md:py-4">
+            <div id="categories-container" class="flex gap-3 md:gap-4 md:justify-center min-w-max">
                 <!-- Categorías inyectadas por JS -->
             </div>
         </div>
     </div>
 
     <!-- Main Content: Grid de Productos -->
-    <main class="container mx-auto px-4 py-12">
-        <h3 id="category-title" class="text-3xl font-bold text-gray-800 mb-8 flex items-center gap-2">
-            Catálogo Completo <span id="product-count" class="text-sm font-normal text-gray-500 ml-2"></span>
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        <!-- AJUSTE: Título responsivo (text-xl en móvil, text-3xl en PC) -->
+        <h3 id="category-title" class="text-xl md:text-3xl font-bold text-gray-800 mb-6 md:mb-8 flex items-center gap-2">
+            Catálogo Completo <span id="product-count" class="text-xs md:text-sm font-normal text-gray-500 ml-2"></span>
         </h3>
 
-        <div id="products-container" class="space-y-12">
+        <div id="products-container" class="space-y-8 md:space-y-12">
             <!-- Productos y frases inyectados por JS -->
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white pt-16 pb-8">
+    <footer class="bg-gray-900 text-white pt-10 md:pt-16 pb-8">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-8 md:mb-12">
                 <div>
                     <div class="mb-4 inline-block">
                         <div class="flex items-center gap-2">
                            <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
                                 alt="Logo Fit" 
-                                class="h-10 w-10 rounded-full object-cover border border-gray-600">
-                           <span class="text-2xl font-bold flex items-center gap-2">TIENDA</span>
+                                class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
+                           <span class="text-xl md:text-2xl font-bold flex items-center gap-2">TIENDA</span>
                         </div>
                      </div>
-                    <p class="text-gray-400">Tu compañero en el camino hacia una vida más saludable. Equipamiento, nutrición y estilo de vida en un solo lugar.</p>
+                    <p class="text-sm md:text-base text-gray-400">Tu compañero en el camino hacia una vida más saludable. Equipamiento, nutrición y estilo de vida en un solo lugar.</p>
                 </div>
                 <div>
-                    <h4 class="font-bold text-lg mb-4">Enlaces Rápidos</h4>
-                    <ul class="space-y-2 text-gray-400">
+                    <h4 class="font-bold text-base md:text-lg mb-4">Enlaces Rápidos</h4>
+                    <ul class="space-y-2 text-sm md:text-base text-gray-400">
                         <li class="hover:text-emerald-400 cursor-pointer">Sobre Nosotros</li>
                         <li class="hover:text-emerald-400 cursor-pointer">Guía de Tallas</li>
                         <li class="hover:text-emerald-400 cursor-pointer">Política de Devolución</li>
@@ -129,25 +131,25 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-bold text-lg mb-4">Boletín</h4>
-                    <p class="text-gray-400 mb-4">Recibe ofertas exclusivas y consejos fitness.</p>
+                    <h4 class="font-bold text-base md:text-lg mb-4">Boletín</h4>
+                    <p class="text-sm md:text-base text-gray-400 mb-4">Recibe ofertas exclusivas y consejos fitness.</p>
                     <div class="flex">
-                        <input type="email" placeholder="Tu correo" class="bg-gray-800 text-white px-4 py-2 rounded-l-lg focus:outline-none w-full border border-gray-700 focus:border-emerald-500">
-                        <button class="bg-emerald-600 px-4 py-2 rounded-r-lg hover:bg-emerald-500 font-bold">Suscribir</button>
+                        <input type="email" placeholder="Tu correo" class="bg-gray-800 text-white px-4 py-2 rounded-l-lg focus:outline-none w-full border border-gray-700 focus:border-emerald-500 text-sm">
+                        <button class="bg-emerald-600 px-4 py-2 rounded-r-lg hover:bg-emerald-500 font-bold text-sm">Suscribir</button>
                     </div>
                 </div>
             </div>
             
             <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-500 text-sm">© 2026 Tienda Fit. Todos los derechos reservados.</p>
+                <p class="text-gray-500 text-xs md:text-sm">© 2026 Tienda Fit. Todos los derechos reservados.</p>
                 
                 <div class="flex items-center gap-4">
-                    <span class="text-gray-400 text-sm">Métodos de Pago:</span>
+                    <span class="text-gray-400 text-xs md:text-sm">Métodos de Pago:</span>
                     <div class="flex gap-2">
-                        <div class="bg-white text-blue-900 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300">VISA</div>
-                        <div class="bg-white text-orange-600 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300">Mastercard</div>
-                        <div class="bg-white text-blue-600 px-2 py-1 rounded font-bold text-xs flex items-center border border-gray-300 font-serif italic">PayPal</div>
-                        <i data-lucide="credit-card" class="text-gray-400"></i>
+                        <div class="bg-white text-blue-900 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300">VISA</div>
+                        <div class="bg-white text-orange-600 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300">Mastercard</div>
+                        <div class="bg-white text-blue-600 px-1.5 py-0.5 md:px-2 md:py-1 rounded font-bold text-[10px] md:text-xs flex items-center border border-gray-300 font-serif italic">PayPal</div>
+                        <i data-lucide="credit-card" class="text-gray-400 w-4 h-4 md:w-6 md:h-6"></i>
                     </div>
                 </div>
             </div>
@@ -162,7 +164,7 @@
         <!-- Panel -->
         <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col slide-in-right">
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h2 class="text-2xl font-bold flex items-center gap-2">
+                <h2 class="text-xl md:text-2xl font-bold flex items-center gap-2">
                     <i data-lucide="shopping-cart" class="text-emerald-600"></i> Tu Carrito
                 </h2>
                 <button onclick="toggleCart(false)" class="p-2 hover:bg-gray-200 rounded-full transition-colors">
@@ -283,9 +285,10 @@
                 <div class="min-w-full h-full relative">
                     <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover brightness-75">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-                        <h2 class="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-lg">${slide.title}</h2>
-                        <p class="text-xl md:text-2xl mb-8 font-light drop-shadow-md">${slide.subtitle}</p>
-                        <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">
+                        <!-- AJUSTE: Textos responsivos (text-2xl móvil / text-6xl PC) -->
+                        <h2 class="text-2xl md:text-6xl font-extrabold mb-2 md:mb-4 drop-shadow-lg leading-tight">${slide.title}</h2>
+                        <p class="text-sm md:text-2xl mb-3 md:mb-8 font-light drop-shadow-md">${slide.subtitle}</p>
+                        <button onclick="setCategory('Novedades')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">
                             Ver Ahora
                         </button>
                     </div>
@@ -293,7 +296,7 @@
             `).join('');
 
             indicators.innerHTML = slides.map((_, idx) => `
-                <button onclick="goToSlide(${idx})" class="w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-8' : 'bg-white/60'}"></button>
+                <button onclick="goToSlide(${idx})" class="w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}"></button>
             `).join('');
             
             updateSlidePosition();
@@ -316,7 +319,7 @@
             // Update indicators
             const dots = document.getElementById('slider-indicators').children;
             Array.from(dots).forEach((dot, idx) => {
-                dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-8' : 'bg-white/60'}`;
+                dot.className = `w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}`;
             });
         }
 
@@ -325,11 +328,11 @@
             const container = document.getElementById('categories-container');
             container.innerHTML = categories.map(cat => `
                 <button onclick="setCategory('${cat.name}')" 
-                    class="flex items-center gap-2 px-6 py-2 rounded-full transition-all whitespace-nowrap font-medium cursor-pointer 
+                    class="flex items-center gap-2 px-4 py-1.5 md:px-6 md:py-2 text-xs md:text-base rounded-full transition-all whitespace-nowrap font-medium cursor-pointer 
                     ${activeCategory === cat.name 
                         ? (cat.name === 'Todas' ? 'bg-gray-800 text-white' : 'bg-emerald-600 text-white shadow-md transform scale-105') 
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
-                    ${cat.icon ? `<i data-lucide="${cat.icon}" width="18" height="18"></i>` : ''}
+                    ${cat.icon ? `<i data-lucide="${cat.icon}" class="w-4 h-4 md:w-[18px] md:h-[18px]"></i>` : ''}
                     ${cat.name}
                 </button>
             `).join('');
@@ -356,7 +359,8 @@
                 ? products 
                 : products.filter(p => p.category === activeCategory || (activeCategory === 'Novedades' && p.category === 'Novedades'));
             
-            title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-sm font-normal text-gray-500 ml-2">(${filtered.length} productos)</span>`;
+            // AJUSTE: Tamaño del contador (text-xs móvil / text-sm PC)
+            title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-xs md:text-sm font-normal text-gray-500 ml-2">(${filtered.length} productos)</span>`;
             
             if (filtered.length === 0) {
                 container.innerHTML = `<div class="text-center py-20 text-gray-500"><p class="text-xl">No hay productos en esta categoría por el momento.</p></div>`;
