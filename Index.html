@@ -229,12 +229,17 @@
                 if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                 
                 const data = await response.json();
+                
+                // Mapear datos incluyendo las nuevas columnas GENERO y NUMERO
+                // Si la columna no existe en BD (aún no se corre el SQL), usa valores por defecto (Masculino, Singular)
                 products = data.map(p => ({
                     id: p.id,
                     name: p.nombre, 
                     price: parseFloat(p.precio),
                     category: p.categoria,
-                    image: p.imagen_url
+                    image: p.imagen_url,
+                    gender: p.genero || 'M', // 'M' o 'F'
+                    number: p.numero || 'S'  // 'S' (Singular) o 'P' (Plural)
                 }));
                 
                 if (loading) loading.classList.add('hidden');
@@ -328,8 +333,25 @@
 
                         <div class="grid grid-cols-3 gap-2 md:gap-8">
                             ${row.map(product => {
-                                // Lógica del link dinámico para cada producto
-                                const message = `Hola, me interesa ${product.name}`;
+                                // --- LÓGICA GRAMATICAL ---
+                                let article = "";
+                                let verb = "interesa"; // Singular por defecto
+
+                                // Definir Verbo (interesa vs interesan)
+                                if (product.number === 'P') {
+                                    verb = "interesan";
+                                }
+
+                                // Definir Artículo (el, la, los, las)
+                                if (product.number === 'S') {
+                                    // Singular
+                                    article = (product.gender === 'F') ? "la" : "el";
+                                } else {
+                                    // Plural
+                                    article = (product.gender === 'F') ? "las" : "los";
+                                }
+
+                                const message = `Hola, me ${verb} ${article} ${product.name}`;
                                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
                                 return `
@@ -354,13 +376,13 @@
                                             <!-- Contenedor Botones (Columna en móvil, Fila en PC) -->
                                             <div class="flex flex-col xl:flex-row gap-2 w-full xl:w-auto">
                                                 
-                                                <!-- BOTÓN CONSULTAR (Verde, Texto + Icono a la derecha) -->
+                                                <!-- BOTÓN CONSULTAR (Verde) -->
                                                 <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
                                                     <span class="text-xs md:text-sm font-bold">Consultar</span>
                                                     <i data-lucide="message-circle" class="w-4 h-4"></i> 
                                                 </a>
                                                 
-                                                <!-- BOTÓN AGREGAR (Negro, Texto + Icono) -->
+                                                <!-- BOTÓN AGREGAR (Negro) -->
                                                 <button onclick="addToCart(${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 xl:order-2">
                                                     <span class="text-xs md:text-sm font-bold">Agregar</span>
                                                     <i data-lucide="plus" class="w-4 h-4"></i> 
