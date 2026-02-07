@@ -231,20 +231,29 @@
             { name: 'Higiene', icon: 'check' }
         ];
 
-        const products = [
-            { id: 1, name: "Proteína Whey Gold", price: 1200, category: "Alimentación", image: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=500&q=60" },
-            { id: 2, name: "Mancuernas 10kg", price: 850, category: "Ejercicio", image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?auto=format&fit=crop&w=500&q=60" },
-            { id: 3, name: "Tapete de Yoga Pro", price: 450, category: "Ejercicio", image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?auto=format&fit=crop&w=500&q=60" },
-            { id: 4, name: "Multivitamínico", price: 350, category: "Salud", image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=500&q=60" },
-            { id: 5, name: "Kit de Bandas", price: 300, category: "Novedades", image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?auto=format&fit=crop&w=500&q=60" },
-            { id: 6, name: "Toalla Microfibra", price: 150, category: "Higiene", image: "https://images.unsplash.com/photo-1616611816278-3b960537f9f9?auto=format&fit=crop&w=500&q=60" },
-            { id: 7, name: "Botella Térmica", price: 280, category: "Novedades", image: "https://images.unsplash.com/photo-1602143407151-01114192008b?auto=format&fit=crop&w=500&q=60" },
-            { id: 8, name: "Monitor Cardíaco", price: 2500, category: "Salud", image: "https://images.unsplash.com/photo-1557166983-5939644443a0?auto=format&fit=crop&w=500&q=60" },
-            { id: 9, name: "Camiseta Dry-Fit", price: 450, category: "Ropa", image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=500&q=60" },
-            { id: 10, name: "Leggings Compresión", price: 600, category: "Ropa", image: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?auto=format&fit=crop&w=500&q=60" },
-            { id: 11, name: "Shorts Running", price: 380, category: "Ropa", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=500&q=60" },
-            { id: 12, name: "Sudadera Ligera", price: 890, category: "Ropa", image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=500&q=60" },
-        ];
+       // Empezamos con la lista vacía
+        let products = []; 
+
+        // Esta función va a buscar los datos a la DB
+        async function fetchProductsFromDB() {
+            try {
+                const response = await fetch('/.netlify/functions/get-productos');
+                const data = await response.json();
+                
+                // Mapeamos los nombres de la DB a los que usa tu diseño
+                products = data.map(p => ({
+                    id: p.id,
+                    name: p.nombre,
+                    price: p.precio,
+                    category: p.categoria,
+                    image: p.imagen_url
+                }));
+                
+                renderProducts(); // Dibujamos la tienda con los datos nuevos
+            } catch (err) {
+                console.error("Error cargando productos:", err);
+            }
+        }
 
         const motivationalQuotes = [
             "¡El dolor es debilidad saliendo de tu cuerpo!",
@@ -551,3 +560,4 @@
     </script>
 </body>
 </html>
+
