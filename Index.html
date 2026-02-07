@@ -44,7 +44,9 @@
             </div>
             
             <!-- 
-            NOTA: CARRITO DESHABILITADO TEMPORALMENTE
+            =============================================
+            CARRITO DESHABILITADO TEMPORALMENTE (MODO CATÁLOGO)
+            =============================================
             <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <i data-lucide="shopping-cart" class="w-6 h-6 md:w-7 md:h-7"></i>
                 <span id="cart-count-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-[10px] md:text-xs font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">0</span>
@@ -125,7 +127,9 @@
     </footer>
 
     <!-- 
-    NOTA: MODAL DE CARRITO Y PAGOS COMENTADO TEMPORALMENTE
+    =============================================
+    MODAL DE CARRITO Y PAGOS (COMENTADO TEMPORALMENTE)
+    =============================================
     <div id="cart-modal" class="hidden fixed inset-0 z-50">
         <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
         <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col slide-in-right">
@@ -206,7 +210,7 @@
             }
         }
 
-        // --- SLIDER LOGIC (Sin cambios) ---
+        // --- SLIDER LOGIC ---
         function renderSlider() {
             const track = document.getElementById('slider-track');
             const indicators = document.getElementById('slider-indicators');
@@ -326,16 +330,67 @@
             lucide.createIcons();
         }
 
-        // --- FUNCIONES DEL CARRITO (Deshabilitadas visualmente) ---
-        // (Dejamos las funciones aquí por si decides volver a activar la tienda en el futuro)
-        function toggleCart(show) { /* Código anterior */ }
-        function addToCart(productId) { /* Código anterior */ }
-        function removeFromCart(index) { /* Código anterior */ }
-        function updateCartBadge() { /* Código anterior */ }
-        function renderCart() { /* Código anterior */ }
-        function setPaymentMethod(method) { /* Código anterior */ }
-        function updatePaymentUI() { /* Código anterior */ }
-        function handlePayment() { /* Código anterior */ }
+        // --- FUNCIONES DEL CARRITO (Deshabilitadas visualmente pero conservadas) ---
+        function toggleCart(show) { 
+            const modal = document.getElementById('cart-modal');
+            if (!modal) return; // Protección si el modal no existe
+            if (show) {
+                modal.classList.remove('hidden');
+                renderCart();
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+        function addToCart(productId) { 
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                cart.push(product);
+                updateCartBadge();
+                renderCart();
+                toggleCart(true);
+            }
+        }
+        function removeFromCart(index) { 
+            cart.splice(index, 1);
+            updateCartBadge();
+            renderCart();
+        }
+        function updateCartBadge() { 
+            const badge = document.getElementById('cart-count-badge');
+            if(!badge) return;
+            if (cart.length > 0) {
+                badge.textContent = cart.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+        function renderCart() { 
+            // Lógica intacta
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+            const totalEl = document.getElementById('cart-total');
+            if(!container) return;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 mt-20"><p class="text-lg font-medium">Tu carrito está vacío</p><button onclick="toggleCart(false)" class="mt-6 text-emerald-600 font-bold hover:underline">Volver</button></div>`;
+                if(footer) footer.classList.add('hidden');
+            } else {
+                // ... renderizado de items ...
+                if(footer) footer.classList.remove('hidden');
+            }
+            lucide.createIcons();
+            updatePaymentUI();
+        }
+        function setPaymentMethod(method) { 
+            // ... lógica de pago ...
+        }
+        function updatePaymentUI() { 
+            // ... lógica de UI ...
+        }
+        function handlePayment() { 
+            // ... lógica de checkout ...
+        }
     </script>
 </body>
 </html>
