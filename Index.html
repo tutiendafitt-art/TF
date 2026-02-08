@@ -126,19 +126,12 @@
         </div>
     </footer>
 
-    <!-- 
-    =============================================
-    MODAL DE LISTA DE PEDIDO
-    =============================================
-    -->
+    <!-- =============================================
+         MODAL DE LISTA DE PEDIDO
+         ============================================= -->
     <div id="cart-modal" class="hidden fixed inset-0 z-50">
-        <!-- Overlay -->
         <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"></div>
-        
-        <!-- Panel Lateral -->
         <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col slide-in-right">
-            
-            <!-- Encabezado Modal -->
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-emerald-50">
                 <div>
                     <h2 class="text-xl font-bold flex items-center gap-2 text-emerald-900">
@@ -150,36 +143,88 @@
                     <i data-lucide="x"></i>
                 </button>
             </div>
-
-            <!-- Lista de Items -->
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
-                <!-- Se llena con JS -->
-            </div>
-
-            <!-- Footer Modal (Total y Botón WhatsApp) -->
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-white"></div>
             <div id="cart-footer" class="p-6 border-t border-gray-100 bg-gray-50 hidden">
                 <div class="flex justify-between items-end mb-4">
                     <span class="text-sm font-medium text-gray-500">Total estimado</span>
                     <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
                 </div>
-                
-                <!-- Botón Principal -->
                 <button onclick="sendOrderToWhatsapp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
                      <span>Consultar Productos</span>
                      <i data-lucide="message-circle" class="w-5 h-5"></i>
                 </button>
-
-                <p class="text-center text-[10px] text-gray-400 mt-3">
-                    Te redirigiremos a WhatsApp con tu selección lista.
-                </p>
+                <p class="text-center text-[10px] text-gray-400 mt-3">Te redirigiremos a WhatsApp con tu selección lista.</p>
             </div>
         </div>
     </div> 
 
+    <!-- =============================================
+         NUEVO: MODAL DE DETALLE DE PRODUCTO
+         ============================================= -->
+    <div id="product-detail-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <!-- Overlay -->
+        <div onclick="closeProductDetail()" class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"></div>
+        
+        <!-- Contenido Modal -->
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl relative flex flex-col md:flex-row">
+            
+            <!-- Botón cerrar móvil -->
+            <button onclick="closeProductDetail()" class="absolute top-4 right-4 z-10 bg-white/50 hover:bg-white p-2 rounded-full backdrop-blur-md md:hidden">
+                <i data-lucide="x" class="text-gray-800"></i>
+            </button>
+
+            <!-- Columna Izquierda: Imágenes -->
+            <div class="w-full md:w-1/2 bg-gray-100 p-4 md:p-8 flex flex-col items-center justify-center relative">
+                <img id="detail-main-image" src="" alt="" class="w-full h-64 md:h-96 object-contain mix-blend-multiply transition-all duration-300">
+                
+                <!-- Galería de miniaturas -->
+                <div id="detail-gallery" class="flex gap-2 mt-4 overflow-x-auto w-full justify-center px-2">
+                    <!-- Se llena con JS -->
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Información -->
+            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
+                <!-- Botón cerrar PC -->
+                <div class="flex justify-end mb-2 hidden md:block">
+                    <button onclick="closeProductDetail()" class="hover:bg-gray-100 p-2 rounded-full transition-colors">
+                        <i data-lucide="x" class="text-gray-500"></i>
+                    </button>
+                </div>
+
+                <div class="mb-2">
+                    <span id="detail-category" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">Categoría</span>
+                </div>
+
+                <h2 id="detail-title" class="text-2xl md:text-4xl font-black text-gray-900 mb-4 leading-tight">Nombre Producto</h2>
+                
+                <p id="detail-description" class="text-gray-600 text-sm md:text-base leading-relaxed mb-8 flex-1">
+                    Descripción del producto...
+                </p>
+
+                <div class="border-t border-gray-100 pt-6 mt-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="text-gray-500 text-sm">Precio</span>
+                        <span id="detail-price" class="text-3xl font-bold text-emerald-600">$0</span>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <a id="detail-whatsapp-btn" href="#" target="_blank" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-200">
+                            <i data-lucide="message-circle"></i> Consultar Ahora
+                        </a>
+                        <button id="detail-add-btn" class="w-full bg-gray-900 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="plus"></i> Agregar a mi Lista
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- DATA ---
-        const whatsappNumber = "526634022969"; // Tu número configurado
+        const whatsappNumber = "526634022969"; 
 
         const slides = [
             { id: 1, title: "Nueva Colección 2026", subtitle: "Ropa técnica para alto rendimiento", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" },
@@ -209,13 +254,11 @@
             "La disciplina es el puente entre tus metas y tus logros.",
         ];
 
-        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             renderSlider();
             renderCategories();
             fetchProductsFromDB();
             renderCart(); 
-            
             setInterval(() => moveSlide(1), 5000);
             lucide.createIcons();
         });
@@ -230,16 +273,17 @@
                 
                 const data = await response.json();
                 
-                // Mapear datos incluyendo las nuevas columnas GENERO y NUMERO
-                // Si la columna no existe en BD (aún no se corre el SQL), usa valores por defecto (Masculino, Singular)
                 products = data.map(p => ({
                     id: p.id,
                     name: p.nombre, 
                     price: parseFloat(p.precio),
                     category: p.categoria,
                     image: p.imagen_url,
-                    gender: p.genero || 'M', // 'M' o 'F'
-                    number: p.numero || 'S'  // 'S' (Singular) o 'P' (Plural)
+                    gender: p.genero || 'M', 
+                    number: p.numero || 'S',
+                    // Campos nuevos (Manejo de errores por si no existen en BD aún)
+                    description: p.descripcion || 'Descripción no disponible.',
+                    gallery: p.imagenes_galeria ? p.imagenes_galeria.split(',') : []
                 }));
                 
                 if (loading) loading.classList.add('hidden');
@@ -249,6 +293,57 @@
                 console.error("Error cargando productos:", err);
                 if (loading) loading.innerHTML = `<p class="text-red-500">Error de conexión. Intenta recargar.</p>`;
             }
+        }
+
+        // --- PRODUCT DETAILS MODAL ---
+        function openProductDetail(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            // Llenar datos
+            document.getElementById('detail-main-image').src = product.image;
+            document.getElementById('detail-category').textContent = product.category;
+            document.getElementById('detail-title').textContent = product.name;
+            document.getElementById('detail-description').textContent = product.description;
+            document.getElementById('detail-price').textContent = `$${product.price}`;
+
+            // Configurar botones del modal
+            const article = (product.number === 'S') ? ((product.gender === 'F') ? "la" : "el") : ((product.gender === 'F') ? "las" : "los");
+            const verb = (product.number === 'P') ? "interesan" : "interesa";
+            const message = `Hola, me ${verb} ${article} ${product.name}`;
+            document.getElementById('detail-whatsapp-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            
+            // Configurar botón agregar (evitar duplicar event listeners)
+            const addBtn = document.getElementById('detail-add-btn');
+            addBtn.onclick = () => {
+                addToCart(product.id);
+                closeProductDetail();
+            };
+
+            // Galería
+            const galleryContainer = document.getElementById('detail-gallery');
+            galleryContainer.innerHTML = '';
+            
+            // Agregar imagen principal a la galería
+            const allImages = [product.image, ...product.gallery];
+            
+            // Filtrar vacíos por si acaso
+            allImages.filter(img => img).forEach(imgSrc => {
+                const thumb = document.createElement('img');
+                thumb.src = imgSrc;
+                thumb.className = "w-16 h-16 object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-emerald-500 transition-all";
+                thumb.onclick = () => {
+                    document.getElementById('detail-main-image').src = imgSrc;
+                };
+                galleryContainer.appendChild(thumb);
+            });
+
+            // Mostrar modal
+            document.getElementById('product-detail-modal').classList.remove('hidden');
+        }
+
+        function closeProductDetail() {
+            document.getElementById('product-detail-modal').classList.add('hidden');
         }
 
         // --- SLIDER LOGIC ---
@@ -333,34 +428,26 @@
 
                         <div class="grid grid-cols-3 gap-2 md:gap-8">
                             ${row.map(product => {
-                                // --- LÓGICA GRAMATICAL ---
                                 let article = "";
-                                let verb = "interesa"; // Singular por defecto
-
-                                // Definir Verbo (interesa vs interesan)
-                                if (product.number === 'P') {
-                                    verb = "interesan";
-                                }
-
-                                // Definir Artículo (el, la, los, las)
-                                if (product.number === 'S') {
-                                    // Singular
-                                    article = (product.gender === 'F') ? "la" : "el";
-                                } else {
-                                    // Plural
-                                    article = (product.gender === 'F') ? "las" : "los";
-                                }
+                                let verb = "interesa"; 
+                                if (product.number === 'P') verb = "interesan";
+                                if (product.number === 'S') article = (product.gender === 'F') ? "la" : "el";
+                                else article = (product.gender === 'F') ? "las" : "los";
 
                                 const message = `Hola, me ${verb} ${article} ${product.name}`;
                                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
                                 return `
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
-                                    <!-- Imagen -->
-                                    <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative">
+                                    <!-- Imagen con Evento ONCLICK para abrir detalles -->
+                                    <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative cursor-pointer" onclick="openProductDetail(${product.id})">
                                         <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">
                                             ${product.category}
+                                        </div>
+                                        <!-- Overlay icono "ver más" al pasar mouse -->
+                                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <span class="bg-white text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">Ver detalles</span>
                                         </div>
                                     </div>
                                     
@@ -368,27 +455,20 @@
                                     <div class="p-2 md:p-5 flex flex-col flex-1">
                                         <h4 class="text-xs md:text-lg font-bold text-gray-800 mb-1 md:mb-2 truncate leading-tight">${product.name}</h4>
                                         
-                                        <!-- Footer Producto: Precio y Botones -->
+                                        <!-- Footer Producto -->
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
-                                            <!-- Precio -->
                                             <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
                                             
-                                            <!-- Contenedor Botones (Columna en móvil, Fila en PC) -->
                                             <div class="flex flex-col xl:flex-row gap-2 w-full xl:w-auto">
-                                                
-                                                <!-- BOTÓN CONSULTAR (Verde) -->
                                                 <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
                                                     <span class="text-xs md:text-sm font-bold">Consultar</span>
                                                     <i data-lucide="message-circle" class="w-4 h-4"></i> 
                                                 </a>
-                                                
-                                                <!-- BOTÓN AGREGAR (Negro) -->
                                                 <button onclick="addToCart(${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 xl:order-2">
                                                     <span class="text-xs md:text-sm font-bold">Agregar</span>
                                                     <i data-lucide="plus" class="w-4 h-4"></i> 
                                                 </button>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -407,7 +487,6 @@
             lucide.createIcons();
         }
 
-        // --- FUNCIONES DE LISTA / CARRITO ---
         function toggleCart(show) { 
             const modal = document.getElementById('cart-modal');
             if (show) {
@@ -485,26 +564,16 @@
             lucide.createIcons();
         }
 
-        // --- ENVIAR LISTA A WHATSAPP ---
         function sendOrderToWhatsapp() {
             if (cart.length === 0) return;
 
             let message = "Hola, me interesa consultar los siguientes productos:\n\n";
-            
-            cart.forEach((item) => {
-                message += `▪️ ${item.name} - $${item.price}\n`;
-            });
-
+            cart.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; });
             const total = cart.reduce((acc, item) => acc + item.price, 0);
             message += `\n💰 *Total Estimado: $${total}*`;
             message += `\n\nQuedo atento a la disponibilidad.`;
 
-            // Codificar para URL
-            const encodedMessage = encodeURIComponent(message);
-            
-            // Usamos el número configurado
-            const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
     </script>
