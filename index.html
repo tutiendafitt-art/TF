@@ -251,14 +251,46 @@
         let activeCategory = 'Todas';
         let currentSlide = 0;
 
+        // --- FRASES MOTIVACIONALES (AMPLIADO) ---
         const motivationalQuotes = [
             "¡El dolor es debilidad saliendo de tu cuerpo!",
             "Tu cuerpo puede con todo, es a tu mente a la que tienes que convencer.",
             "No pares cuando estés cansado, para cuando hayas terminado.",
             "La disciplina es el puente entre tus metas y tus logros.",
+            "Cada gota de sudor es un paso más cerca de tu mejor versión.",
+            "Invierte en ti mismo, es la mejor inversión que harás jamás.",
+            "Si no te desafía, no te cambia.",
+            "El único mal entrenamiento es el que no se hace.",
+            "Tu salud es tu riqueza.",
+            "No cuentes los días, haz que los días cuenten.",
+            "Entrena como una bestia, luce como una belleza.",
+            "La motivación es lo que te pone en marcha, el hábito es lo que hace que sigas.",
+            "No esperes a que sea más fácil, tú hazte más fuerte.",
+            "El sudor es la grasa llorando.",
+            "La diferencia entre lo imposible y lo posible depende de tu voluntad.",
+            "No te rindas, el principio es siempre la parte más difícil.",
+            "El éxito comienza con la autodisciplina.",
+            "Hazlo por ti, no por nadie más.",
+            "Cree en ti y todo será posible.",
+            "Tu cuerpo es tu templo, cuídalo.",
+            "El dolor de hoy será tu fuerza de mañana.",
+            "Sé más fuerte que tus excusas.",
+            "La constancia es la clave del éxito.",
+            "Visualiza tu meta y no pares hasta alcanzarla."
         ];
 
+        // Función para barajar (mezclar) el array de frases
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Mezclamos las frases al iniciar la página
+            shuffleArray(motivationalQuotes);
+            
             renderSlider();
             renderCategories();
             fetchProductsFromDB();
