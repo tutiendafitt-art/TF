@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda Fit 2026</title>
     
+    <!-- Favicon -->
+    <link rel="icon" href="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -434,18 +437,23 @@
 
                                 return `
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
+                                    <!-- Imagen con Evento ONCLICK para abrir detalles -->
                                     <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative cursor-pointer" onclick="openProductDetail(${product.id})">
                                         <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">
                                             ${product.category}
                                         </div>
+                                        <!-- Overlay icono "ver más" al pasar mouse -->
                                         <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span class="bg-white text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">Ver detalles</span>
                                         </div>
                                     </div>
                                     
+                                    <!-- Contenido -->
                                     <div class="p-2 md:p-5 flex flex-col flex-1">
                                         <h4 class="text-xs md:text-lg font-bold text-gray-800 mb-1 md:mb-2 truncate leading-tight">${product.name}</h4>
+                                        
+                                        <!-- Footer Producto -->
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
                                             <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
                                             
