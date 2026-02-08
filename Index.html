@@ -37,7 +37,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <!-- LOGO -->
-                <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" 
+                <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" 
                      alt="Logo Fit" 
                      class="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover border-2 border-emerald-100">
                 <h1 class="text-xl md:text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
@@ -101,7 +101,8 @@
                 <div>
                     <div class="mb-4 inline-block">
                         <div class="flex items-center gap-2">
-                           <img src="https://lh3.googleusercontent.com/a/ACg8ocJUha3dsnWQe5y_9OV08sQ_yruAOKs8uTy8gnkMJTeq-5E9Cg=s432-c-no" class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
+                           <!-- LOGO FOOTER -->
+                           <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
                            <span class="text-xl md:text-2xl font-bold flex items-center gap-2">TIENDA</span>
                         </div>
                      </div>
@@ -159,7 +160,7 @@
     </div> 
 
     <!-- =============================================
-         NUEVO: MODAL DE DETALLE DE PRODUCTO
+         MODAL DE DETALLE DE PRODUCTO
          ============================================= -->
     <div id="product-detail-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
         <!-- Overlay -->
@@ -263,12 +264,15 @@
             lucide.createIcons();
         });
 
-        // --- DATABASE LOGIC ---
+        // --- DATABASE LOGIC (VERCEL ADAPTADA) ---
         async function fetchProductsFromDB() {
             const loading = document.getElementById('loading-indicator');
             try {
                 if (loading) loading.classList.remove('hidden');
-                const response = await fetch('/.netlify/functions/get-productos');
+                
+                // CAMBIO IMPORTANTE: Ruta de Vercel (/api/...)
+                const response = await fetch('/api/get-productos');
+                
                 if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
                 
                 const data = await response.json();
@@ -281,7 +285,6 @@
                     image: p.imagen_url,
                     gender: p.genero || 'M', 
                     number: p.numero || 'S',
-                    // Campos nuevos (Manejo de errores por si no existen en BD aún)
                     description: p.descripcion || 'Descripción no disponible.',
                     gallery: p.imagenes_galeria ? p.imagenes_galeria.split(',') : []
                 }));
@@ -300,34 +303,27 @@
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
-            // Llenar datos
             document.getElementById('detail-main-image').src = product.image;
             document.getElementById('detail-category').textContent = product.category;
             document.getElementById('detail-title').textContent = product.name;
             document.getElementById('detail-description').textContent = product.description;
             document.getElementById('detail-price').textContent = `$${product.price}`;
 
-            // Configurar botones del modal
             const article = (product.number === 'S') ? ((product.gender === 'F') ? "la" : "el") : ((product.gender === 'F') ? "las" : "los");
             const verb = (product.number === 'P') ? "interesan" : "interesa";
             const message = `Hola, me ${verb} ${article} ${product.name}`;
             document.getElementById('detail-whatsapp-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
             
-            // Configurar botón agregar (evitar duplicar event listeners)
             const addBtn = document.getElementById('detail-add-btn');
             addBtn.onclick = () => {
                 addToCart(product.id);
                 closeProductDetail();
             };
 
-            // Galería
             const galleryContainer = document.getElementById('detail-gallery');
             galleryContainer.innerHTML = '';
             
-            // Agregar imagen principal a la galería
             const allImages = [product.image, ...product.gallery];
-            
-            // Filtrar vacíos por si acaso
             allImages.filter(img => img).forEach(imgSrc => {
                 const thumb = document.createElement('img');
                 thumb.src = imgSrc;
@@ -338,7 +334,6 @@
                 galleryContainer.appendChild(thumb);
             });
 
-            // Mostrar modal
             document.getElementById('product-detail-modal').classList.remove('hidden');
         }
 
@@ -439,23 +434,18 @@
 
                                 return `
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
-                                    <!-- Imagen con Evento ONCLICK para abrir detalles -->
                                     <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative cursor-pointer" onclick="openProductDetail(${product.id})">
                                         <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">
                                             ${product.category}
                                         </div>
-                                        <!-- Overlay icono "ver más" al pasar mouse -->
                                         <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span class="bg-white text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">Ver detalles</span>
                                         </div>
                                     </div>
                                     
-                                    <!-- Contenido -->
                                     <div class="p-2 md:p-5 flex flex-col flex-1">
                                         <h4 class="text-xs md:text-lg font-bold text-gray-800 mb-1 md:mb-2 truncate leading-tight">${product.name}</h4>
-                                        
-                                        <!-- Footer Producto -->
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
                                             <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
                                             
