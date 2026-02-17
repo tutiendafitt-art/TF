@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda Fit 2026</title>
+    <title>Tienda Fit</title>
     
     <!-- Favicon -->
     <link rel="icon" href="https://lh3.googleusercontent.com/d/1JN9KbpYsd-bGH8Bkx9tfY_wHeoMsKQEZ">
@@ -35,6 +35,13 @@
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
 
+    <!-- SPLASH SCREEN (PANTALLA DE CARGA) -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center transition-opacity duration-700 ease-out">
+        <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" 
+             alt="Cargando..." 
+             class="w-40 h-40 md:w-64 md:h-64 object-contain">
+    </div>
+
     <!-- Navbar Principal -->
     <nav class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -43,13 +50,11 @@
                 <img src="https://lh3.googleusercontent.com/d/1JJ7D9UJQLsDxDNXBOYcbSxpidFtuABEh" 
                      alt="Logo Fit" 
                      class="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover">
-                <h1 class="text-xl md:text-2xl font-black text-emerald-800 tracking-tighter hidden md:block">TIENDA</h1>
+                <!-- Eliminado el texto TIENDA -->
             </div>
             
             <div class="flex items-center gap-3">
-                <a href="https://wa.me/526634022969?text=Hola,%20tengo%20una%20duda%20general" target="_blank" class="hidden md:flex items-center gap-2 text-emerald-600 font-bold hover:bg-emerald-50 px-3 py-2 rounded-lg transition-colors text-sm">
-                    <i data-lucide="message-circle" class="w-4 h-4"></i> Ayuda
-                </a>
+                <!-- Eliminado el botón Ayuda -->
 
                 <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors group">
                     <div class="relative">
@@ -109,7 +114,7 @@
                            <img src="https://lh3.googleusercontent.com/d/1JJ7D9UJQLsDxDNXBOYcbSxpidFtuABEh" class="h-8 w-8 md:h-10 md:w-10 rounded-full object-cover border border-gray-600">
                            <span class="text-xl md:text-2xl font-bold flex items-center gap-2">TIENDA</span>
                         </div>
-                     </div>
+                      </div>
                     <p class="text-sm md:text-base text-gray-400">Tu compañero en el camino hacia una vida más saludable.</p>
                 </div>
                 <div>
@@ -152,9 +157,10 @@
                     <span class="text-sm font-medium text-gray-500">Total estimado</span>
                     <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
                 </div>
-                <button onclick="sendOrderToWhatsapp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
-                     <span>Consultar Productos</span>
-                     <i data-lucide="message-circle" class="w-5 h-5"></i>
+                <!-- Botón WhatsApp Carrito Actualizado -->
+                <button onclick="sendOrderToWhatsapp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
+                      <span>Consultar Productos</span>
+                      <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-5 h-5 object-contain filter invert brightness-0">
                 </button>
                 <p class="text-center text-[10px] text-gray-400 mt-3">Te redirigiremos a WhatsApp con tu selección lista.</p>
             </div>
@@ -189,8 +195,9 @@
                         <span id="detail-price" class="text-3xl font-bold text-emerald-600">$0</span>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <a id="detail-whatsapp-btn" href="#" target="_blank" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-200">
-                            <i data-lucide="message-circle"></i> Consultar Ahora
+                        <!-- Botón WhatsApp Detalle Actualizado -->
+                        <a id="detail-whatsapp-btn" href="#" target="_blank" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-200">
+                            <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-6 h-6 object-contain filter invert brightness-0"> Consultar Ahora
                         </a>
                         <button id="detail-add-btn" class="w-full bg-gray-900 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all">
                             <i data-lucide="plus"></i> Agregar a mi Lista
@@ -216,6 +223,15 @@
         let currentSlide = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Manejo del Splash Screen
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0'; // Desvanece
+                setTimeout(() => {
+                    splash.style.display = 'none'; // Quita del flujo
+                }, 700); // Espera a que termine la transición de opacidad
+            }, 2500); // Muestra por 2.5 segundos
+
             // Cargar datos en paralelo
             Promise.all([
                 fetchBannersFromDB(),
@@ -401,9 +417,9 @@
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
                                             <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
                                             <div class="flex flex-col xl:flex-row gap-2 w-full xl:w-auto">
-                                                <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
+                                                <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
                                                     <span class="text-xs md:text-sm font-bold">Consultar</span>
-                                                    <i data-lucide="message-circle" class="w-4 h-4"></i> 
+                                                    <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-4 h-4 object-contain filter invert brightness-0"> 
                                                 </a>
                                                 <button onclick="addToCart(${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 xl:order-2">
                                                     <span class="text-xs md:text-sm font-bold">Agregar</span>
