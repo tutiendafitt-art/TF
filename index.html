@@ -39,7 +39,7 @@
     <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center transition-opacity duration-700 ease-out">
         <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" 
              alt="Cargando..." 
-             class="w-40 h-40 md:w-64 md:h-64 object-contain">
+             class="w-64 h-64 md:w-96 md:h-96 object-contain">
     </div>
 
     <!-- Navbar Principal -->
@@ -230,7 +230,7 @@
                 setTimeout(() => {
                     splash.style.display = 'none'; // Quita del flujo
                 }, 700); // Espera a que termine la transición de opacidad
-            }, 2500); // Muestra por 2.5 segundos
+            }, 1500); // Muestra por 1.5 segundos (Antes 2.5)
 
             // Cargar datos en paralelo
             Promise.all([
