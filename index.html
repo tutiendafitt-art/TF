@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TÍTULO ACTUALIZADO -->
     <title>Tienda Fit</title>
     
     <!-- Favicon -->
@@ -36,18 +35,30 @@
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
 
-    <!-- Navbar Principal (LIMPIO: Solo Logo y Carrito) -->
+    <!-- =============================================
+         SPLASH SCREEN (PANTALLA DE CARGA)
+         ============================================= -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center transition-opacity duration-700">
+        <div class="flex flex-col items-center animate-pulse">
+            <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" 
+                 alt="Tienda Fit Logo" 
+                 class="w-40 h-40 md:w-56 md:h-56 object-contain mb-4">
+            <!-- Opcional: Texto de carga -->
+            <!-- <p class="text-emerald-600 font-bold tracking-widest text-sm">CARGANDO...</p> -->
+        </div>
+    </div>
+
+    <!-- Navbar Principal -->
     <nav class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <!-- LOGO (Sin texto al lado) -->
+                <!-- LOGO -->
                 <img src="https://lh3.googleusercontent.com/d/1JJ7D9UJQLsDxDNXBOYcbSxpidFtuABEh" 
                      alt="Logo Fit" 
                      class="h-10 w-10 md:h-12 md:w-12 rounded-full object-cover">
             </div>
             
             <div class="flex items-center gap-3">
-                <!-- Solo queda el botón de la lista -->
                 <button onclick="toggleCart(true)" class="relative p-2 hover:bg-gray-100 rounded-full transition-colors group">
                     <div class="relative">
                         <i data-lucide="shopping-bag" class="w-6 h-6 md:w-7 md:h-7 text-gray-700 group-hover:text-emerald-600 transition-colors"></i>
@@ -59,20 +70,22 @@
     </nav>
 
     <!-- Slider (Dinámico) -->
-    <div class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group">
-        <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
+    <div id="slider-container" class="relative w-full h-72 md:h-[400px] bg-gray-200 overflow-hidden group touch-pan-y select-none">
+        <div id="slider-track" class="flex h-full w-full" style="transform: translateX(0%); transition: transform 0.5s ease-out;">
             <!-- Se llena con JS -->
         </div>
-        <button onclick="moveSlide(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-            <i data-lucide="chevron-left" class="w-6 h-6 md:w-8 md:h-8"></i>
+        
+        <button onclick="moveSlide(-1)" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10">
+            <i data-lucide="chevron-left" class="w-8 h-8"></i>
         </button>
-        <button onclick="moveSlide(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-            <i data-lucide="chevron-right" class="w-6 h-6 md:w-8 md:h-8"></i>
+        <button onclick="moveSlide(1)" class="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10">
+            <i data-lucide="chevron-right" class="w-8 h-8"></i>
         </button>
-        <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+        
+        <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10"></div>
     </div>
 
-    <!-- Menú de Categorías (Dinámico) -->
+    <!-- Menú de Categorías -->
     <div class="bg-white border-b border-gray-200 sticky top-[64px] md:top-[72px] z-30 shadow-sm overflow-x-auto no-scrollbar">
         <div class="container mx-auto px-4 py-3 md:py-4">
             <div id="categories-container" class="flex gap-3 md:gap-4 md:justify-center min-w-max">
@@ -87,10 +100,9 @@
             Catálogo Completo <span id="product-count" class="text-xs md:text-sm font-normal text-gray-500 ml-2"></span>
         </h3>
 
-        <!-- Spinner Carga -->
         <div id="loading-indicator" class="text-center py-10 hidden">
-            <i data-lucide="loader-2" class="animate-spin w-10 h-10 text-emerald-600 mx-auto"></i>
-            <p class="mt-2 text-gray-500">Cargando catálogo...</p>
+            <!-- El loading indicator se oculta porque ahora tenemos el splash screen -->
+            <!-- <i data-lucide="loader-2" class="animate-spin w-10 h-10 text-emerald-600 mx-auto"></i> -->
         </div>
 
         <div id="products-container" class="space-y-8 md:space-y-12"></div>
@@ -150,7 +162,6 @@
                     <span class="text-sm font-medium text-gray-500">Total estimado</span>
                     <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
                 </div>
-                <!-- BOTÓN LISTA: Color #10b981 (bg-emerald-500) e Icono Personalizado -->
                 <button onclick="sendOrderToWhatsapp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
                      <span>Consultar Productos</span>
                      <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" class="w-6 h-6 object-contain" alt="WhatsApp">
@@ -188,7 +199,6 @@
                         <span id="detail-price" class="text-3xl font-bold text-emerald-600">$0</span>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <!-- BOTÓN DETALLE: Color #10b981 (bg-emerald-500) e Icono Personalizado -->
                         <a id="detail-whatsapp-btn" href="#" target="_blank" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200">
                             <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" class="w-6 h-6 object-contain" alt="WhatsApp">
                             <span>Consultar Ahora</span>
@@ -214,76 +224,124 @@
         let cart = []; 
         let activeCategory = 'Todas';
         let currentSlide = 0;
+        let sliderInterval; 
+
+        // VARIABLES TOUCH (SWIPE)
+        let isDragging = false;
+        let startPos = 0;
+        let startPosY = 0; 
+        let currentTranslate = 0;
+        let prevTranslate = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Cargar datos en paralelo
-            Promise.all([
+            // Promesa para cargar todo, con un mínimo de tiempo para el Splash
+            const minSplashTime = new Promise(resolve => setTimeout(resolve, 2000)); // Mínimo 2 seg
+            const dataLoad = Promise.all([
                 fetchBannersFromDB(),
                 fetchCategoriesFromDB(),
                 fetchProductsFromDB(),
                 fetchQuotesFromDB()
-            ]).then(() => {
-                // Todo cargado
+            ]);
+
+            Promise.all([dataLoad, minSplashTime]).then(() => {
+                // Ocultar Splash Screen cuando todo esté listo
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.classList.add('hidden');
+                }, 700);
+
                 renderCart();
-                setInterval(() => moveSlide(1), 5000);
+                startAutoSlider(); 
+                setupSwipe(); 
             });
             lucide.createIcons();
         });
 
-        // --- 1. FETCH BANNERS ---
+        // --- SETUP SWIPE FLUIDO ---
+        function setupSwipe() {
+            const sliderContainer = document.getElementById('slider-container');
+            const track = document.getElementById('slider-track');
+
+            if (!sliderContainer || !track) return;
+
+            sliderContainer.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                startPos = e.touches[0].clientX;
+                startPosY = e.touches[0].clientY; 
+                clearInterval(sliderInterval);
+                track.style.transition = 'none'; 
+                const width = sliderContainer.offsetWidth;
+                prevTranslate = -currentSlide * width; 
+            }, { passive: false }); 
+
+            sliderContainer.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const currentPosition = e.touches[0].clientX;
+                const currentPositionY = e.touches[0].clientY;
+                const diffX = Math.abs(currentPosition - startPos);
+                const diffY = Math.abs(currentPositionY - startPosY);
+
+                if (diffX > diffY && diffX > 5) {
+                    e.preventDefault(); 
+                    const currentMove = currentPosition - startPos;
+                    currentTranslate = prevTranslate + currentMove;
+                    track.style.transform = `translateX(${currentTranslate}px)`;
+                }
+            }, { passive: false });
+
+            sliderContainer.addEventListener('touchend', () => {
+                isDragging = false;
+                const width = sliderContainer.offsetWidth;
+                const movedBy = currentTranslate - prevTranslate;
+                
+                if (movedBy < -40) {
+                    moveSlide(1); 
+                } else if (movedBy > 40) {
+                    moveSlide(-1);
+                } else {
+                    updateSlidePosition();
+                }
+                startAutoSlider(); 
+            });
+        }
+
+        // --- FETCH FUNCTIONS ---
         async function fetchBannersFromDB() {
             try {
                 const response = await fetch('/api/get-banners');
                 if (!response.ok) throw new Error("Error fetching banners");
                 const data = await response.json();
-                
-                slides = data.map(b => ({
-                    id: b.id,
-                    title: b.titulo,
-                    subtitle: b.subtitulo,
-                    image: b.imagen_url
-                }));
-                
+                slides = data.map(b => ({ id: b.id, title: b.titulo, subtitle: b.subtitulo, image: b.imagen_url }));
                 renderSlider();
             } catch (err) {
-                console.error("Error banners:", err);
-                slides = [{title: "Bienvenido", subtitle: "Cargando ofertas...", image: "https://via.placeholder.com/1350x400"}];
+                console.error(err);
+                slides = [
+                    {title: "Bienvenido", subtitle: "Desliza para ver más", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"},
+                    {title: "Ofertas", subtitle: "Lo mejor para ti", image: "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"}
+                ];
                 renderSlider();
             }
         }
 
-        // --- 2. FETCH CATEGORIAS ---
         async function fetchCategoriesFromDB() {
             try {
                 const response = await fetch('/api/get-categorias');
-                if (!response.ok) throw new Error("Error fetching categories");
+                if (!response.ok) throw new Error("Error");
                 const data = await response.json();
-                
-                categories = [
-                    { name: 'Todas', icon: null },
-                    ...data.map(c => ({
-                        name: c.nombre,
-                        icon: c.icono
-                    }))
-                ];
-                
+                categories = [{ name: 'Todas', icon: null }, ...data.map(c => ({ name: c.nombre, icon: c.icono }))];
                 renderCategories();
             } catch (err) {
-                console.error("Error categorias:", err);
                 categories = [{ name: 'Todas', icon: null }];
                 renderCategories();
             }
         }
 
-        // --- 3. FETCH PRODUCTOS ---
         async function fetchProductsFromDB() {
-            const loading = document.getElementById('loading-indicator');
             try {
-                if (loading) loading.classList.remove('hidden');
                 const response = await fetch('/api/get-productos');
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                if (!response.ok) throw new Error("Error");
                 const data = await response.json();
-                
                 products = data.map(p => ({
                     id: p.id,
                     name: p.nombre, 
@@ -295,35 +353,25 @@
                     description: p.descripcion || 'Descripción no disponible.',
                     gallery: p.imagenes_galeria ? p.imagenes_galeria.split(',') : []
                 }));
-                
-                if (loading) loading.classList.add('hidden');
                 renderProducts();
                 lucide.createIcons();
             } catch (err) {
-                console.error("Error productos:", err);
-                if (loading) loading.innerHTML = `<p class="text-red-500">Error de conexión.</p>`;
+                console.error(err);
             }
         }
 
-        // --- 4. FETCH FRASES ---
         async function fetchQuotesFromDB() {
             try {
                 const response = await fetch('/api/get-frases');
-                if (!response.ok) throw new Error("Error fetching quotes");
+                if (!response.ok) throw new Error("Error");
                 const data = await response.json();
-                
-                dbQuotes = data.map(q => ({
-                    text: q.texto,
-                    category: q.categoria || 'General' 
-                }));
-                
+                dbQuotes = data.map(q => ({ text: q.texto, category: q.categoria || 'General' }));
                 if (products.length > 0) renderProducts();
             } catch (err) {
                 dbQuotes = [{ text: "¡Sigue entrenando!", category: "General" }];
             }
         }
 
-        // Función para barajar (mezclar) array
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -331,15 +379,10 @@
             }
         }
 
-        // --- RENDER PRODUCTS + LOGICA FRASES ---
         function renderProducts() {
             const container = document.getElementById('products-container');
             const title = document.getElementById('category-title');
-            
-            const filteredProducts = activeCategory === 'Todas' 
-                ? products 
-                : products.filter(p => p.category === activeCategory);
-            
+            const filteredProducts = activeCategory === 'Todas' ? products : products.filter(p => p.category === activeCategory);
             title.innerHTML = `${activeCategory === 'Todas' ? 'Catálogo Completo' : activeCategory} <span class="text-xs md:text-sm font-normal text-gray-500 ml-2">(${filteredProducts.length} productos)</span>`;
             
             if (filteredProducts.length === 0) {
@@ -364,21 +407,13 @@
 
             container.innerHTML = rows.map((row, rowIndex) => {
                 const quoteObj = currentQuotes.length > 0 ? currentQuotes[rowIndex % currentQuotes.length] : { text: "¡Sigue adelante!", category: "General" };
-
                 return `
                 <div class="fade-in-up" style="animation-delay: ${rowIndex * 100}ms">
                     <div class="relative">
-                        <div class="absolute -left-12 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-left" width="48" height="48"></i></div>
-                        <div class="absolute -right-12 top-1/2 -translate-y-1/2 text-gray-300 hidden xl:block"><i data-lucide="chevron-right" width="48" height="48"></i></div>
-
                         <div class="grid grid-cols-3 gap-2 md:gap-8">
                             ${row.map(product => {
-                                let article = "";
-                                let verb = "interesa"; 
-                                if (product.number === 'P') verb = "interesan";
-                                if (product.number === 'S') article = (product.gender === 'F') ? "la" : "el";
-                                else article = (product.gender === 'F') ? "las" : "los";
-
+                                let article = product.number === 'S' ? ((product.gender === 'F') ? "la" : "el") : ((product.gender === 'F') ? "las" : "los");
+                                let verb = product.number === 'P' ? "interesan" : "interesa";
                                 const message = `Hola, me ${verb} ${article} ${product.name}`;
                                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
@@ -386,26 +421,21 @@
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
                                     <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative cursor-pointer" onclick="openProductDetail(${product.id})">
                                         <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                                        <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">
-                                            ${product.category}
-                                        </div>
+                                        <div class="absolute top-1 right-1 md:top-2 md:right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded-md text-[8px] md:text-xs font-bold text-gray-600 uppercase">${product.category}</div>
                                         <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span class="bg-white text-gray-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg">Ver detalles</span>
                                         </div>
                                     </div>
                                     <div class="p-2 md:p-5 flex flex-col flex-1">
                                         <h4 class="text-xs md:text-lg font-bold text-gray-800 mb-1 md:mb-2 truncate leading-tight">${product.name}</h4>
-                                        <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
-                                            <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
-                                            <div class="flex flex-col xl:flex-row gap-2 w-full xl:w-auto">
-                                                
-                                                <!-- BOTÓN CONSULTAR (GRID): Color #10b981 e Icono Personalizado -->
-                                                <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
+                                        <div class="mt-auto flex flex-col lg:flex-row justify-between items-center lg:items-end gap-2">
+                                            <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full lg:w-auto text-left">$${product.price}</span>
+                                            <div class="flex flex-col lg:flex-row gap-2 w-full lg:w-auto">
+                                                <a href="${whatsappUrl}" target="_blank" class="flex-1 lg:flex-none w-full lg:w-32 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 lg:order-1">
                                                     <span class="text-xs md:text-sm font-bold">Consultar</span>
                                                     <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" class="w-4 h-4 object-contain" alt="WhatsApp">
                                                 </a>
-                                                
-                                                <button onclick="addToCart(${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 xl:order-2">
+                                                <button onclick="addToCart(${product.id})" class="flex-1 lg:flex-none w-full lg:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 lg:order-2">
                                                     <span class="text-xs md:text-sm font-bold">Agregar</span>
                                                     <i data-lucide="plus" class="w-4 h-4"></i> 
                                                 </button>
@@ -418,44 +448,69 @@
                     </div>
                     <div class="mt-4 md:mt-8 relative overflow-hidden rounded-lg md:rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-3 md:p-6 flex items-center justify-center shadow-sm">
                         <p class="text-center font-bold italic text-emerald-800 text-xs md:text-xl relative z-10 flex items-center gap-1 md:gap-3">
-                            <span class="text-emerald-400 text-xl md:text-4xl leading-none">"</span>
-                            ${quoteObj.text}
-                            <span class="text-emerald-400 text-xl md:text-4xl leading-none">"</span>
+                            <span class="text-emerald-400 text-xl md:text-4xl leading-none">"</span>${quoteObj.text}<span class="text-emerald-400 text-xl md:text-4xl leading-none">"</span>
                         </p>
                     </div>
-                </div>
-            `}).join('');
+                </div>`
+            }).join('');
             lucide.createIcons();
         }
 
-        // ... resto de funciones sin cambios ...
         function renderSlider() {
             const track = document.getElementById('slider-track');
             const indicators = document.getElementById('slider-indicators');
             if(slides.length === 0) return;
-            track.innerHTML = slides.map(slide => `<div class="min-w-full h-full relative"><img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover brightness-75"><div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4"><h2 class="text-2xl md:text-6xl font-extrabold mb-2 md:mb-4 drop-shadow-lg leading-tight">${slide.title}</h2><p class="text-sm md:text-2xl mb-3 md:mb-8 font-light drop-shadow-md">${slide.subtitle}</p><button onclick="setCategory('${categories[1]?.name || 'Todas'}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">Ver Ahora</button></div></div>`).join('');
+            track.innerHTML = slides.map(slide => `
+                <div class="min-w-full h-full relative shrink-0">
+                    <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" draggable="false">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
+                        <h2 class="text-2xl md:text-6xl font-extrabold mb-2 md:mb-4 drop-shadow-lg leading-tight pointer-events-none select-none">${slide.title}</h2>
+                        <p class="text-sm md:text-2xl mb-3 md:mb-8 font-light drop-shadow-md pointer-events-none select-none">${slide.subtitle}</p>
+                        ${slide.title ? `<button onclick="setCategory('${categories[1]?.name || 'Todas'}')" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 md:px-8 md:py-3 text-xs md:text-base rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg cursor-pointer">Ver Ahora</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
             indicators.innerHTML = slides.map((_, idx) => `<button onclick="goToSlide(${idx})" class="w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}"></button>`).join('');
             updateSlidePosition();
         }
+
         function renderCategories() {
             const container = document.getElementById('categories-container');
             container.innerHTML = categories.map(cat => `<button onclick="setCategory('${cat.name}')" class="flex items-center gap-2 px-4 py-1.5 md:px-6 md:py-2 text-xs md:text-base rounded-full transition-all whitespace-nowrap font-medium cursor-pointer ${activeCategory === cat.name ? (cat.name === 'Todas' ? 'bg-gray-800 text-white' : 'bg-emerald-600 text-white shadow-md transform scale-105') : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${cat.icon ? `<i data-lucide="${cat.icon}" class="w-4 h-4 md:w-[18px] md:h-[18px]"></i>` : ''} ${cat.name}</button>`).join('');
             lucide.createIcons();
         }
+
         function setCategory(name) {
             activeCategory = name;
             renderCategories();
             renderProducts();
             document.getElementById('category-title').scrollIntoView({ behavior: 'smooth' });
         }
-        function moveSlide(direction) { currentSlide = (currentSlide + direction + slides.length) % slides.length; updateSlidePosition(); }
-        function goToSlide(index) { currentSlide = index; updateSlidePosition(); }
+
+        function startAutoSlider() {
+            clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => moveSlide(1), 5000);
+        }
+
+        function moveSlide(direction) { 
+            currentSlide = (currentSlide + direction + slides.length) % slides.length; 
+            updateSlidePosition(); 
+        }
+
+        function goToSlide(index) { 
+            currentSlide = index; 
+            startAutoSlider();
+            updateSlidePosition(); 
+        }
+
         function updateSlidePosition() {
             const track = document.getElementById('slider-track');
+            track.style.transition = 'transform 0.5s ease-out';
             track.style.transform = `translateX(-${currentSlide * 100}%)`;
             const dots = document.getElementById('slider-indicators').children;
             Array.from(dots).forEach((dot, idx) => { dot.className = `w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}`; });
         }
+
         function openProductDetail(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
@@ -482,18 +537,28 @@
             });
             document.getElementById('product-detail-modal').classList.remove('hidden');
         }
+
         function closeProductDetail() { document.getElementById('product-detail-modal').classList.add('hidden'); }
         function toggleCart(show) { const modal = document.getElementById('cart-modal'); if (show) { modal.classList.remove('hidden'); renderCart(); } else { modal.classList.add('hidden'); } }
         function addToCart(productId) { const product = products.find(p => p.id === productId); if (product) { cart.push(product); updateCartBadge(); renderCart(); toggleCart(true); } }
         function removeFromCart(index) { cart.splice(index, 1); updateCartBadge(); renderCart(); }
         function updateCartBadge() { const badge = document.getElementById('cart-count-badge'); if (cart.length > 0) { badge.textContent = cart.length; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
-        function renderCart() { 
+        function renderCart() { 
             const container = document.getElementById('cart-items-container'); const footer = document.getElementById('cart-footer'); const totalEl = document.getElementById('cart-total');
-            if (cart.length === 0) { container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4"><div class="bg-gray-100 p-6 rounded-full"><i data-lucide="clipboard-list" class="w-12 h-12 text-gray-300"></i></div><div class="text-center"><p class="text-lg font-medium text-gray-600">Tu lista está vacía</p><p class="text-sm">Selecciona productos para armar tu pedido.</p></div><button onclick="toggleCart(false)" class="text-emerald-600 font-bold hover:underline text-sm mt-4">Volver al catálogo</button></div>`; footer.classList.add('hidden'); } 
+            if (cart.length === 0) { container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4"><div class="bg-gray-100 p-6 rounded-full"><i data-lucide="clipboard-list" class="w-12 h-12 text-gray-300"></i></div><div class="text-center"><p class="text-lg font-medium text-gray-600">Tu lista está vacía</p><p class="text-sm">Selecciona productos para armar tu pedido.</p></div><button onclick="toggleCart(false)" class="text-emerald-600 font-bold hover:underline text-sm mt-4">Volver al catálogo</button></div>`; footer.classList.add('hidden'); } 
             else { container.innerHTML = cart.map((item, index) => `<div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-xl items-center shadow-sm hover:shadow-md transition-shadow"><img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg bg-gray-100"><div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 text-sm truncate">${item.name}</h4><p class="text-xs text-gray-500">${item.category}</p><p class="text-emerald-600 font-bold mt-0.5">$${item.price}</p></div><button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join(''); const total = cart.reduce((acc, item) => acc + item.price, 0); totalEl.textContent = `$${total}`; footer.classList.remove('hidden'); }
             lucide.createIcons();
         }
-        function sendOrderToWhatsapp() { if (cart.length === 0) return; let message = "Hola, me interesa consultar los siguientes productos:\n\n"; cart.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; }); const total = cart.reduce((acc, item) => acc + item.price, 0); message += `\n💰 *Total Estimado: $${total}*`; message += `\n\nQuedo atento a la disponibilidad.`; const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`; window.open(url, '_blank'); }
+        function sendOrderToWhatsapp() {
+            if (cart.length === 0) return;
+            let message = "Hola, me interesa consultar los siguientes productos:\n\n";
+            cart.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; });
+            const total = cart.reduce((acc, item) => acc + item.price, 0);
+            message += `\n💰 *Total Estimado: $${total}*`;
+            message += `\n\nQuedo atento a la disponibilidad.`;
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
     </script>
 </body>
 </html>
