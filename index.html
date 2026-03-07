@@ -67,14 +67,14 @@
     </nav>
 
     <!-- Slider (Dinámico) -->
-    <div id="slider-wrapper" class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing select-none">
+    <div id="slider-wrapper" class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden md:group cursor-grab active:cursor-grabbing select-none">
         <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
             <!-- Se llena con JS -->
         </div>
-        <button onclick="moveSlide(-1, true)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10 items-center justify-center">
+        <button onclick="moveSlide(-1, true)" class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10 items-center justify-center pointer-events-none md:pointer-events-auto">
             <i data-lucide="chevron-left" class="w-8 h-8"></i>
         </button>
-        <button onclick="moveSlide(1, true)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10 items-center justify-center">
+        <button onclick="moveSlide(1, true)" class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10 items-center justify-center pointer-events-none md:pointer-events-auto">
             <i data-lucide="chevron-right" class="w-8 h-8"></i>
         </button>
         <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10"></div>
@@ -463,6 +463,8 @@
             const cloneLast  = slideHTML(slides[slides.length - 1]);
             track.innerHTML  = cloneLast + slides.map(s => slideHTML(s)).join('') + cloneFirst;
             indicators.innerHTML = slides.map((_, idx) => `<button onclick="goToSlide(${idx})" class="w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300"></button>`).join('');
+            visualPos = 1;
+            currentSlide = 0;
             track.style.transition = 'none';
             track.style.transform  = `translateX(-100%)`;
             updateDots();
@@ -489,45 +491,62 @@
             freezeTimeout = setTimeout(() => startAutoSlide(), 30000);
         }
 
+        // visualPos lleva la posición actual del track (incluye clones)
+        // Layout: [0=clonLast, 1=slide0, 2=slide1, ..., n=slideN-1, n+1=clonFirst]
+        let visualPos = 1; // arranca en slide real 0
+
         function moveSlide(direction, userAction = false) {
             const track = document.getElementById('slider-track');
             const n = slides.length;
-            // visualIndex: 0=clonLast, 1..n=reales, n+1=clonFirst
-            const visualIndex = currentSlide + 1 + direction;
+            if (sliderTransitioning) return;
+
+            sliderTransitioning = true;
+            visualPos += direction;
             track.style.transition = 'transform 0.5s ease-out';
-            track.style.transform  = `translateX(-${visualIndex * 100}%)`;
-            currentSlide = (currentSlide + direction + n) % n;
+            track.style.transform  = `translateX(-${visualPos * 100}%)`;
+
+            // currentSlide real (para los puntos)
+            if (visualPos === 0) {
+                currentSlide = n - 1;
+            } else if (visualPos === n + 1) {
+                currentSlide = 0;
+            } else {
+                currentSlide = visualPos - 1;
+            }
             updateDots();
             if (userAction) freezeAutoSlide();
 
-            // Si cayó en clon, hacer jump silencioso después de la transición
+            // Después de la transición, si estamos en un clon → jump silencioso
             track.addEventListener('transitionend', function onEnd() {
                 track.removeEventListener('transitionend', onEnd);
-                if (visualIndex === 0) {
-                    // Estamos en clonLast → saltar a slide real n-1
+                if (visualPos === 0) {
+                    visualPos = n;
                     track.style.transition = 'none';
                     track.style.transform  = `translateX(-${n * 100}%)`;
-                } else if (visualIndex === n + 1) {
-                    // Estamos en clonFirst → saltar a slide real 0
+                } else if (visualPos === n + 1) {
+                    visualPos = 1;
                     track.style.transition = 'none';
                     track.style.transform  = `translateX(-100%)`;
                 }
+                sliderTransitioning = false;
             }, { once: true });
         }
 
         function goToSlide(index) {
             const track = document.getElementById('slider-track');
             currentSlide = index;
+            visualPos = index + 1;
             track.style.transition = 'transform 0.5s ease-out';
-            track.style.transform  = `translateX(-${(index + 1) * 100}%)`;
+            track.style.transform  = `translateX(-${visualPos * 100}%)`;
             updateDots();
             freezeAutoSlide();
         }
 
         function updateSlidePosition() {
             const track = document.getElementById('slider-track');
+            visualPos = currentSlide + 1;
             track.style.transition = 'none';
-            track.style.transform  = `translateX(-${(currentSlide + 1) * 100}%)`;
+            track.style.transform  = `translateX(-${visualPos * 100}%)`;
             updateDots();
         }
 
@@ -553,14 +572,14 @@
                 isDragging = true;
                 startX = x;
                 currentX = x;
+                sliderTransitioning = false;
                 track.style.transition = 'none';
             }
             function onDragMove(x) {
                 if (!isDragging) return;
                 currentX = x;
                 const diff = currentX - startX;
-                const visualIndex = currentSlide + 1;
-                track.style.transform = `translateX(calc(-${visualIndex * 100}% + ${diff}px))`;
+                track.style.transform = `translateX(calc(-${visualPos * 100}% + ${diff}px))`;
             }
             function onDragEnd() {
                 if (!isDragging) return;
@@ -571,7 +590,8 @@
                     else moveSlide(-1, true);
                 } else {
                     track.style.transition = 'transform 0.5s ease-out';
-                    track.style.transform = `translateX(-${(currentSlide + 1) * 100}%)`;
+                    track.style.transform = `translateX(-${visualPos * 100}%)`;
+                    setTimeout(() => { sliderTransitioning = false; }, 500);
                 }
             }
 
