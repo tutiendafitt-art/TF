@@ -67,17 +67,17 @@
     </nav>
 
     <!-- Slider (Dinámico) -->
-    <div class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group">
+    <div id="slider-wrapper" class="relative w-full h-56 md:h-[400px] bg-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing select-none">
         <div id="slider-track" class="flex transition-transform duration-500 ease-out h-full" style="transform: translateX(0%);">
             <!-- Se llena con JS -->
         </div>
-        <button onclick="moveSlide(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+        <button onclick="moveSlide(-1)" class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10">
             <i data-lucide="chevron-left" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
-        <button onclick="moveSlide(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
+        <button onclick="moveSlide(1)" class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 p-1 md:p-2 rounded-full text-white backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 cursor-pointer z-10">
             <i data-lucide="chevron-right" class="w-6 h-6 md:w-8 md:h-8"></i>
         </button>
-        <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+        <div id="slider-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10"></div>
     </div>
 
     <!-- Menú de Categorías (Dinámico) -->
@@ -262,11 +262,13 @@
                 }));
                 
                 renderSlider();
+                initSliderSwipe();
             } catch (err) {
                 console.error("Error banners:", err);
                 // Fallback visual si falla
                 slides = [{title: "Bienvenido", subtitle: "Cargando ofertas...", image: "https://via.placeholder.com/1350x400"}];
                 renderSlider();
+                initSliderSwipe();
             }
         }
 
@@ -466,6 +468,55 @@
             track.style.transform = `translateX(-${currentSlide * 100}%)`;
             const dots = document.getElementById('slider-indicators').children;
             Array.from(dots).forEach((dot, idx) => { dot.className = `w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${currentSlide === idx ? 'bg-emerald-500 w-6 md:w-8' : 'bg-white/60'}`; });
+        }
+
+        // --- SWIPE / DRAG SUPPORT ---
+        function initSliderSwipe() {
+            const wrapper = document.getElementById('slider-wrapper');
+            const track = document.getElementById('slider-track');
+            if (!wrapper) return;
+
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+            const SWIPE_THRESHOLD = 50;
+
+            function onDragStart(x) {
+                isDragging = true;
+                startX = x;
+                currentX = x;
+                track.style.transition = 'none';
+            }
+            function onDragMove(x) {
+                if (!isDragging) return;
+                currentX = x;
+                const diff = currentX - startX;
+                const baseOffset = -(currentSlide * 100);
+                const pct = (diff / wrapper.offsetWidth) * 100;
+                track.style.transform = `translateX(calc(${baseOffset}% + ${diff}px))`;
+            }
+            function onDragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.transition = 'transform 0.5s ease-out';
+                const diff = currentX - startX;
+                if (Math.abs(diff) > SWIPE_THRESHOLD) {
+                    if (diff < 0) moveSlide(1);
+                    else moveSlide(-1);
+                } else {
+                    updateSlidePosition();
+                }
+            }
+
+            // Touch events
+            wrapper.addEventListener('touchstart', e => onDragStart(e.touches[0].clientX), { passive: true });
+            wrapper.addEventListener('touchmove', e => onDragMove(e.touches[0].clientX), { passive: true });
+            wrapper.addEventListener('touchend', onDragEnd);
+
+            // Mouse drag events
+            wrapper.addEventListener('mousedown', e => { e.preventDefault(); onDragStart(e.clientX); });
+            window.addEventListener('mousemove', e => { if (isDragging) onDragMove(e.clientX); });
+            window.addEventListener('mouseup', () => { if (isDragging) onDragEnd(); });
         }
         function openProductDetail(productId) {
             const product = products.find(p => p.id === productId);
