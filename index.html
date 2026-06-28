@@ -31,6 +31,45 @@
         /* Ocultar scrollbar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ===== PANTALLA COMPLETA DE PRODUCTO (estilo app móvil) ===== */
+        #product-detail-modal {
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        #product-detail-modal.open {
+            transform: translateX(0);
+        }
+
+        /* ===== OVERLAY DE MÉTODO DE ENTREGA (derecha a izquierda) ===== */
+        #delivery-overlay {
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        #delivery-overlay.open {
+            transform: translateX(0);
+        }
+
+        /* Tarjetas de método de entrega */
+        .delivery-option-card {
+            transition: all 0.2s ease;
+        }
+        .delivery-option-card:not(.opacity-50):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.25);
+        }
+        .delivery-option-card:not(.opacity-50):active {
+            transform: scale(0.98);
+        }
+
+        /* Animación de paneles de formulario dentro del overlay */
+        .delivery-step {
+            animation: slideStepIn 0.3s ease-out forwards;
+        }
+        @keyframes slideStepIn {
+            from { opacity: 0; transform: translateX(16px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
@@ -159,7 +198,7 @@
                     <span id="cart-total" class="text-3xl font-bold text-gray-900">$0</span>
                 </div>
                 <!-- Botón WhatsApp Carrito Actualizado -->
-                <button onclick="sendOrderToWhatsapp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
+                <button onclick="openDeliveryOverlay('cart')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 cursor-pointer transform active:scale-95">
                       <span>Consultar Productos</span>
                       <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-5 h-5 object-contain filter invert brightness-0">
                 </button>
@@ -168,43 +207,184 @@
         </div>
     </div> 
 
-    <!-- MODAL DE DETALLE DE PRODUCTO -->
-    <div id="product-detail-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div onclick="closeProductDetail()" class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"></div>
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl relative flex flex-col md:flex-row">
-            <button onclick="closeProductDetail()" class="absolute top-4 right-4 z-10 bg-white/50 hover:bg-white p-2 rounded-full backdrop-blur-md md:hidden">
-                <i data-lucide="x" class="text-gray-800"></i>
-            </button>
-            <div class="w-full md:w-1/2 bg-gray-100 p-4 md:p-8 flex flex-col items-center justify-center relative">
-                <img id="detail-main-image" src="" alt="" class="w-full h-64 md:h-96 object-contain mix-blend-multiply transition-all duration-300">
-                <div id="detail-gallery" class="flex gap-2 mt-4 overflow-x-auto w-full justify-center px-2"></div>
+    <!-- PANTALLA COMPLETA DE DETALLE DE PRODUCTO (estilo app móvil) -->
+    <div id="product-detail-modal" class="hidden fixed inset-0 z-[60] bg-white overflow-y-auto no-scrollbar">
+
+        <!-- Flecha para salir: fija arriba a la izquierda -->
+        <button onclick="closeProductDetail()" class="fixed top-4 left-4 z-[70] bg-white/90 hover:bg-white shadow-lg p-2.5 rounded-full backdrop-blur-md transition-all active:scale-90">
+            <i data-lucide="arrow-left" class="text-gray-900 w-6 h-6"></i>
+        </button>
+
+        <!-- Botón de carrito flotante (arriba a la derecha) -->
+        <button onclick="toggleCart(true)" class="fixed top-4 right-4 z-[70] bg-white/90 hover:bg-white shadow-lg p-2.5 rounded-full backdrop-blur-md transition-all active:scale-90">
+            <div class="relative">
+                <i data-lucide="shopping-bag" class="text-gray-900 w-6 h-6"></i>
+                <span id="detail-cart-count-badge" class="hidden absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">0</span>
             </div>
-            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
-                <div class="flex justify-end mb-2 hidden md:block">
-                    <button onclick="closeProductDetail()" class="hover:bg-gray-100 p-2 rounded-full transition-colors">
-                        <i data-lucide="x" class="text-gray-500"></i>
+        </button>
+
+        <!-- Imagen grande arriba -->
+        <div class="w-full h-[42vh] md:h-[55vh] bg-gray-100 relative flex items-center justify-center">
+            <img id="detail-main-image" src="" alt="" class="w-full h-full object-contain mix-blend-multiply transition-all duration-300">
+        </div>
+
+        <!-- Galería de miniaturas -->
+        <div id="detail-gallery" class="flex gap-2 -mt-2 mb-2 overflow-x-auto no-scrollbar w-full justify-center px-4"></div>
+
+        <!-- Info deslizable abajo, con esquinas redondeadas tipo "sheet" -->
+        <div class="relative bg-white rounded-t-3xl shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.1)] -mt-4 px-6 pt-6 pb-32 md:max-w-3xl md:mx-auto">
+            <!-- Indicador visual de "deslizable" -->
+            <div class="w-10 h-1.5 bg-gray-200 rounded-full mx-auto mb-5"></div>
+
+            <div class="mb-2">
+                <span id="detail-category" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">Categoría</span>
+            </div>
+            <h2 id="detail-title" class="text-2xl md:text-4xl font-black text-gray-900 mb-3 leading-tight">Nombre Producto</h2>
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-gray-500 text-sm">Precio</span>
+                <span id="detail-price" class="text-3xl font-bold text-emerald-600">$0</span>
+            </div>
+            <p id="detail-description" class="text-gray-600 text-sm md:text-base leading-relaxed">Descripción del producto...</p>
+        </div>
+
+        <!-- Barra de acciones fija abajo -->
+        <div class="fixed bottom-0 left-0 right-0 z-[65] bg-white border-t border-gray-100 p-4 md:px-10 flex gap-3 md:max-w-3xl md:mx-auto md:left-1/2 md:-translate-x-1/2 md:rounded-t-2xl md:shadow-2xl">
+            <button id="detail-add-btn" class="flex-1 bg-gray-900 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-95">
+                <i data-lucide="plus"></i> Agregar
+            </button>
+            <button id="detail-whatsapp-btn" onclick="openDeliveryOverlay('single')" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-200 active:scale-95">
+                Consultar Ahora
+            </button>
+        </div>
+    </div>
+
+    <!-- OVERLAY DE MÉTODO DE ENTREGA (se desliza de derecha a izquierda) -->
+    <div id="delivery-overlay" class="hidden fixed inset-0 z-[80]">
+        <div onclick="closeDeliveryOverlay()" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col overflow-y-auto">
+
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-emerald-50 sticky top-0 z-10">
+                <div>
+                    <h2 id="delivery-overlay-title" class="text-xl font-bold flex items-center gap-2 text-emerald-900">
+                        <i data-lucide="truck" class="text-emerald-600"></i> ¿Cómo prefieres recibirlo?
+                    </h2>
+                    <p class="text-xs text-emerald-600 mt-1">Elige una opción para continuar</p>
+                </div>
+                <button onclick="closeDeliveryOverlay()" class="p-2 hover:bg-white rounded-full transition-colors text-gray-500 flex-shrink-0">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 p-6">
+
+                <!-- PASO 1: Selección de método (3 cuadros apilados) -->
+                <div id="delivery-step-method" class="delivery-step space-y-4">
+
+                    <!-- Pick Up -->
+                    <div onclick="selectDeliveryMethod('pickup')" class="delivery-option-card cursor-pointer bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+                        <div class="bg-emerald-50 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="map-pin" class="w-8 h-8 text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-base">Pick Up</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Acordar punto de entrega</p>
+                        </div>
+                    </div>
+
+                    <!-- Envío local -->
+                    <div onclick="selectDeliveryMethod('envio')" class="delivery-option-card cursor-pointer bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+                        <div class="bg-emerald-50 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="bike" class="w-8 h-8 text-emerald-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-900 text-base">Envío</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Entrega en cualquier punto</p>
+                        </div>
+                    </div>
+
+                    <!-- Envío nacional (próximamente) -->
+                    <div class="delivery-option-card opacity-50 cursor-not-allowed bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm relative">
+                        <div class="bg-gray-100 w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="package" class="w-8 h-8 text-gray-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-500 text-base">Envío Nacional</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Próximamente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2A: Formulario Pick Up -->
+                <div id="delivery-step-pickup" class="delivery-step hidden space-y-4">
+                    <button onclick="backToDeliveryMethod()" class="flex items-center gap-1 text-emerald-600 font-bold text-sm mb-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
+                    </button>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Nombre completo</label>
+                        <input type="text" id="pickup-nombre" placeholder="Ej. Juan Pérez" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Número de teléfono</label>
+                        <input type="tel" id="pickup-telefono" placeholder="Ej. 664 000 0000" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Fecha de recolección</label>
+                        <input type="date" id="pickup-fecha" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Punto de entrega</label>
+                        <select id="pickup-lugar" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 bg-white">
+                            <option value="">Selecciona un lugar...</option>
+                        </select>
+                    </div>
+
+                    <button onclick="submitDeliveryForm('pickup')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 mt-2">
+                        <span>Enviar por WhatsApp</span>
+                        <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-5 h-5 object-contain filter invert brightness-0">
                     </button>
                 </div>
-                <div class="mb-2">
-                    <span id="detail-category" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded uppercase tracking-wide">Categoría</span>
-                </div>
-                <h2 id="detail-title" class="text-2xl md:text-4xl font-black text-gray-900 mb-4 leading-tight">Nombre Producto</h2>
-                <p id="detail-description" class="text-gray-600 text-sm md:text-base leading-relaxed mb-8 flex-1">Descripción del producto...</p>
-                <div class="border-t border-gray-100 pt-6 mt-auto">
-                    <div class="flex items-center justify-between mb-6">
-                        <span class="text-gray-500 text-sm">Precio</span>
-                        <span id="detail-price" class="text-3xl font-bold text-emerald-600">$0</span>
+
+                <!-- PASO 2B: Formulario Envío -->
+                <div id="delivery-step-envio" class="delivery-step hidden space-y-4">
+                    <button onclick="backToDeliveryMethod()" class="flex items-center gap-1 text-emerald-600 font-bold text-sm mb-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver
+                    </button>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Nombre completo</label>
+                        <input type="text" id="envio-nombre" placeholder="Ej. Juan Pérez" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
                     </div>
-                    <div class="flex flex-col gap-3">
-                        <!-- Botón WhatsApp Detalle Actualizado -->
-                        <a id="detail-whatsapp-btn" href="#" target="_blank" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-200">
-                            <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-6 h-6 object-contain filter invert brightness-0"> Consultar Ahora
-                        </a>
-                        <button id="detail-add-btn" class="w-full bg-gray-900 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all">
-                            <i data-lucide="plus"></i> Agregar a mi Lista
-                        </button>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Dirección</label>
+                        <input type="text" id="envio-direccion" placeholder="Ej. Col. Centro, entre calles..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
                     </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Calle</label>
+                            <input type="text" id="envio-calle" placeholder="Ej. Av. Revolución" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1.5">Número</label>
+                            <input type="text" id="envio-numero" placeholder="Ej. 123" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Número de teléfono</label>
+                        <input type="tel" id="envio-telefono" placeholder="Ej. 664 000 0000" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1.5">Referencias (opcional)</label>
+                        <input type="text" id="envio-referencias" placeholder="Ej. Casa azul, portón negro" class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+
+                    <button onclick="submitDeliveryForm('envio')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-emerald-200 flex justify-center items-center gap-2 mt-2">
+                        <span>Enviar por WhatsApp</span>
+                        <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-5 h-5 object-contain filter invert brightness-0">
+                    </button>
                 </div>
+
             </div>
         </div>
     </div>
@@ -223,6 +403,12 @@
         let activeCategory = 'Todas';
         let currentSlide = 0;
 
+        // --- Flujo de entrega (Pick Up / Envío) ---
+        let sucursales = []; // Se carga desde DB
+        let deliveryContext = null; // 'cart' | 'single'
+        let deliveryProductId = null; // id del producto si el contexto es 'single'
+        let deliveryMethod = null; // 'pickup' | 'envio'
+
         document.addEventListener('DOMContentLoaded', () => {
             // Manejo del Splash Screen
             setTimeout(() => {
@@ -238,7 +424,8 @@
                 fetchBannersFromDB(),
                 fetchCategoriesFromDB(),
                 fetchProductsFromDB(),
-                fetchQuotesFromDB()
+                fetchQuotesFromDB(),
+                fetchSucursalesFromDB()
             ]).then(() => {
                 // Todo cargado
                 renderCart();
@@ -343,6 +530,35 @@
             }
         }
 
+        // --- 5. FETCH SUCURSALES / PUNTOS DE PICK UP ---
+        async function fetchSucursalesFromDB() {
+            try {
+                const response = await fetch('/api/get-sucursales');
+                if (!response.ok) throw new Error("Error fetching sucursales");
+                const data = await response.json();
+
+                sucursales = data.map(s => ({
+                    id: s.id,
+                    nombre: s.nombre,
+                    direccion: s.direccion || ''
+                }));
+
+                renderPickupOptions();
+            } catch (err) {
+                console.error("Error sucursales:", err);
+                // Fallback para que el select no quede vacío si falla la API
+                sucursales = [{ id: 0, nombre: 'Confirmar por WhatsApp', direccion: '' }];
+                renderPickupOptions();
+            }
+        }
+
+        function renderPickupOptions() {
+            const select = document.getElementById('pickup-lugar');
+            if (!select) return;
+            select.innerHTML = '<option value="">Selecciona un lugar...</option>' +
+                sucursales.map(s => `<option value="${s.nombre}">${s.nombre}</option>`).join('');
+        }
+
         // ... (RESTO DE FUNCIONES LÓGICAS IGUAL QUE ANTES: Shuffle, Sliders, Cart, etc.) ...
         
         function shuffleArray(array) {
@@ -393,15 +609,6 @@
 
                         <div class="grid grid-cols-3 gap-2 md:gap-8">
                             ${row.map(product => {
-                                let article = "";
-                                let verb = "interesa"; 
-                                if (product.number === 'P') verb = "interesan";
-                                if (product.number === 'S') article = (product.gender === 'F') ? "la" : "el";
-                                else article = (product.gender === 'F') ? "las" : "los";
-
-                                const message = `Hola, me ${verb} ${article} ${product.name}`;
-                                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
                                 return `
                                 <div class="bg-white rounded-lg md:rounded-xl shadow-sm md:shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group flex flex-col border border-gray-100 md:border-none">
                                     <div class="h-28 sm:h-40 md:h-64 overflow-hidden relative cursor-pointer" onclick="openProductDetail(${product.id})">
@@ -418,10 +625,10 @@
                                         <div class="mt-auto flex flex-col xl:flex-row justify-between items-center xl:items-end gap-2">
                                             <span class="text-lg md:text-2xl font-bold text-emerald-600 w-full xl:w-auto text-left">$${product.price}</span>
                                             <div class="flex flex-col xl:flex-row gap-2 w-full xl:w-auto">
-                                                <a href="${whatsappUrl}" target="_blank" class="flex-1 xl:flex-none w-full xl:w-32 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer no-underline group/btn order-1 xl:order-1">
+                                                <button onclick="openDeliveryOverlay('single', ${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-1 xl:order-1">
                                                     <span class="text-xs md:text-sm font-bold">Consultar</span>
                                                     <img src="https://lh3.googleusercontent.com/d/1x3RGjtIGKNGAb8U9C0vmMnOep-QOAk7I" alt="WhatsApp" class="w-4 h-4 object-contain filter invert brightness-0"> 
-                                                </a>
+                                                </button>
                                                 <button onclick="addToCart(${product.id})" class="flex-1 xl:flex-none w-full xl:w-32 bg-gray-900 hover:bg-emerald-600 text-white py-2 px-3 rounded md:rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer order-2 xl:order-2">
                                                     <span class="text-xs md:text-sm font-bold">Agregar</span>
                                                     <i data-lucide="plus" class="w-4 h-4"></i> 
@@ -611,10 +818,7 @@
             document.getElementById('detail-title').textContent = product.name;
             document.getElementById('detail-description').textContent = product.description;
             document.getElementById('detail-price').textContent = `$${product.price}`;
-            const article = (product.number === 'S') ? ((product.gender === 'F') ? "la" : "el") : ((product.gender === 'F') ? "las" : "los");
-            const verb = (product.number === 'P') ? "interesan" : "interesa";
-            const message = `Hola, me ${verb} ${article} ${product.name}`;
-            document.getElementById('detail-whatsapp-btn').href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            document.getElementById('detail-whatsapp-btn').onclick = () => openDeliveryOverlay('single', product.id);
             const addBtn = document.getElementById('detail-add-btn');
             addBtn.onclick = () => { addToCart(product.id); closeProductDetail(); };
             const galleryContainer = document.getElementById('detail-gallery');
@@ -623,16 +827,33 @@
             allImages.filter(img => img).forEach(imgSrc => {
                 const thumb = document.createElement('img');
                 thumb.src = imgSrc;
-                thumb.className = "w-16 h-16 object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-emerald-500 transition-all";
+                thumb.className = "w-16 h-16 object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-emerald-500 transition-all flex-shrink-0";
                 thumb.onclick = () => { document.getElementById('detail-main-image').src = imgSrc; };
                 galleryContainer.appendChild(thumb);
             });
-            document.getElementById('product-detail-modal').classList.remove('hidden');
+            updateDetailCartBadge();
+            const modal = document.getElementById('product-detail-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            // Pequeño delay para que la transición de transform se anime correctamente
+            requestAnimationFrame(() => modal.classList.add('open'));
+            lucide.createIcons();
         }
-        function closeProductDetail() { document.getElementById('product-detail-modal').classList.add('hidden'); }
+        function closeProductDetail() {
+            const modal = document.getElementById('product-detail-modal');
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+            setTimeout(() => modal.classList.add('hidden'), 350);
+        }
+        function updateDetailCartBadge() {
+            const badge = document.getElementById('detail-cart-count-badge');
+            if (!badge) return;
+            if (cart.length > 0) { badge.textContent = cart.length; badge.classList.remove('hidden'); }
+            else { badge.classList.add('hidden'); }
+        }
         function toggleCart(show) { const modal = document.getElementById('cart-modal'); if (show) { modal.classList.remove('hidden'); renderCart(); } else { modal.classList.add('hidden'); } }
-        function addToCart(productId) { const product = products.find(p => p.id === productId); if (product) { cart.push(product); updateCartBadge(); renderCart(); toggleCart(true); } }
-        function removeFromCart(index) { cart.splice(index, 1); updateCartBadge(); renderCart(); }
+        function addToCart(productId) { const product = products.find(p => p.id === productId); if (product) { cart.push(product); updateCartBadge(); updateDetailCartBadge(); renderCart(); toggleCart(true); } }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartBadge(); updateDetailCartBadge(); renderCart(); }
         function updateCartBadge() { const badge = document.getElementById('cart-count-badge'); if (cart.length > 0) { badge.textContent = cart.length; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
         function renderCart() { 
             const container = document.getElementById('cart-items-container'); const footer = document.getElementById('cart-footer'); const totalEl = document.getElementById('cart-total');
@@ -641,7 +862,120 @@
             lucide.createIcons();
         }
         function setCategory(name) { activeCategory = name; renderCategories(); renderProducts(); document.getElementById('category-title').scrollIntoView({ behavior: 'smooth' }); }
-        function sendOrderToWhatsapp() { if (cart.length === 0) return; let message = "Hola, me interesa consultar los siguientes productos:\n\n"; cart.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; }); const total = cart.reduce((acc, item) => acc + item.price, 0); message += `\n💰 *Total Estimado: $${total}*`; message += `\n\nQuedo atento a la disponibilidad.`; const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`; window.open(url, '_blank'); }
+
+        // ==== OVERLAY DE MÉTODO DE ENTREGA ====
+
+        function openDeliveryOverlay(context, productId = null) {
+            // context: 'cart' (viene del carrito) o 'single' (un solo producto desde detalle/tarjeta)
+            if (context === 'cart' && cart.length === 0) return;
+
+            deliveryContext = context;
+            deliveryProductId = productId;
+            deliveryMethod = null;
+
+            // Reiniciar el overlay siempre en el paso 1
+            document.getElementById('delivery-step-method').classList.remove('hidden');
+            document.getElementById('delivery-step-pickup').classList.add('hidden');
+            document.getElementById('delivery-step-envio').classList.add('hidden');
+            document.getElementById('delivery-overlay-title').innerHTML = `<i data-lucide="truck" class="text-emerald-600"></i> ¿Cómo prefieres recibirlo?`;
+
+            const overlay = document.getElementById('delivery-overlay');
+            overlay.classList.remove('hidden');
+            requestAnimationFrame(() => overlay.classList.add('open'));
+            lucide.createIcons();
+        }
+
+        function closeDeliveryOverlay() {
+            const overlay = document.getElementById('delivery-overlay');
+            overlay.classList.remove('open');
+            setTimeout(() => overlay.classList.add('hidden'), 350);
+        }
+
+        function selectDeliveryMethod(method) {
+            deliveryMethod = method;
+            document.getElementById('delivery-step-method').classList.add('hidden');
+
+            if (method === 'pickup') {
+                document.getElementById('delivery-step-pickup').classList.remove('hidden');
+                document.getElementById('delivery-overlay-title').innerHTML = `<i data-lucide="map-pin" class="text-emerald-600"></i> Pick Up`;
+            } else if (method === 'envio') {
+                document.getElementById('delivery-step-envio').classList.remove('hidden');
+                document.getElementById('delivery-overlay-title').innerHTML = `<i data-lucide="bike" class="text-emerald-600"></i> Envío`;
+            }
+            lucide.createIcons();
+        }
+
+        function backToDeliveryMethod() {
+            deliveryMethod = null;
+            document.getElementById('delivery-step-pickup').classList.add('hidden');
+            document.getElementById('delivery-step-envio').classList.add('hidden');
+            document.getElementById('delivery-step-method').classList.remove('hidden');
+            document.getElementById('delivery-overlay-title').innerHTML = `<i data-lucide="truck" class="text-emerald-600"></i> ¿Cómo prefieres recibirlo?`;
+            lucide.createIcons();
+        }
+
+        function getDeliveryProductList() {
+            // Devuelve la lista de productos a incluir en el mensaje, según el contexto
+            if (deliveryContext === 'single') {
+                const product = products.find(p => p.id === deliveryProductId);
+                return product ? [product] : [];
+            }
+            return cart;
+        }
+
+        function submitDeliveryForm(method) {
+            const itemsList = getDeliveryProductList();
+            if (itemsList.length === 0) { closeDeliveryOverlay(); return; }
+
+            let message = "Hola, me interesa consultar los siguientes productos:\n\n";
+            itemsList.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; });
+            const total = itemsList.reduce((acc, item) => acc + item.price, 0);
+            message += `\n💰 *Total Estimado: $${total}*\n`;
+
+            if (method === 'pickup') {
+                const nombre = document.getElementById('pickup-nombre').value.trim();
+                const telefono = document.getElementById('pickup-telefono').value.trim();
+                const fecha = document.getElementById('pickup-fecha').value;
+                const lugar = document.getElementById('pickup-lugar').value;
+
+                if (!nombre || !telefono || !lugar) {
+                    alert('Por favor completa nombre, teléfono y punto de entrega.');
+                    return;
+                }
+
+                message += `\n📦 *Método: Pick Up*\n`;
+                message += `👤 Nombre: ${nombre}\n`;
+                message += `📱 Teléfono: ${telefono}\n`;
+                if (fecha) message += `📅 Fecha: ${fecha}\n`;
+                message += `📍 Punto de entrega: ${lugar}\n`;
+
+            } else if (method === 'envio') {
+                const nombre = document.getElementById('envio-nombre').value.trim();
+                const direccion = document.getElementById('envio-direccion').value.trim();
+                const calle = document.getElementById('envio-calle').value.trim();
+                const numero = document.getElementById('envio-numero').value.trim();
+                const telefono = document.getElementById('envio-telefono').value.trim();
+                const referencias = document.getElementById('envio-referencias').value.trim();
+
+                if (!nombre || !direccion || !calle || !numero || !telefono) {
+                    alert('Por favor completa nombre, dirección, calle, número y teléfono.');
+                    return;
+                }
+
+                message += `\n🚚 *Método: Envío*\n`;
+                message += `👤 Nombre: ${nombre}\n`;
+                message += `🏠 Dirección: ${direccion}\n`;
+                message += `🛣️ Calle: ${calle}\n`;
+                message += `🔢 Número: ${numero}\n`;
+                message += `📱 Teléfono: ${telefono}\n`;
+                if (referencias) message += `📝 Referencias: ${referencias}\n`;
+            }
+
+            message += `\nQuedo atento a la disponibilidad.`;
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+            closeDeliveryOverlay();
+        }
     </script>
 </body>
 </html>
