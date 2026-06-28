@@ -70,6 +70,17 @@
             from { opacity: 0; transform: translateX(16px); }
             to { opacity: 1; transform: translateX(0); }
         }
+
+        /* ===== EVITAR ZOOM AUTOMÁTICO EN MÓVIL AL TOCAR UN INPUT ===== */
+        /* iOS hace zoom cuando el font-size de un campo es menor a 16px. */
+        input, select, textarea {
+            font-size: 16px;
+        }
+        @media (min-width: 768px) {
+            input, select, textarea {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
@@ -188,7 +199,7 @@
                     <p class="text-xs text-emerald-600 mt-1">Revisa tus productos antes de pedir</p>
                 </div>
                 <button onclick="toggleCart(false)" class="p-2 hover:bg-white rounded-full transition-colors text-gray-500">
-                    <i data-lucide="x"></i>
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
                 </button>
             </div>
             <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 bg-white"></div>
@@ -210,21 +221,21 @@
     <!-- PANTALLA COMPLETA DE DETALLE DE PRODUCTO (estilo app móvil) -->
     <div id="product-detail-modal" class="hidden fixed inset-0 z-[60] bg-white overflow-y-auto no-scrollbar">
 
-        <!-- Flecha para salir: fija arriba a la izquierda -->
-        <button onclick="closeProductDetail()" class="fixed top-4 left-4 z-[70] bg-white/90 hover:bg-white shadow-lg p-2.5 rounded-full backdrop-blur-md transition-all active:scale-90">
-            <i data-lucide="arrow-left" class="text-gray-900 w-6 h-6"></i>
-        </button>
-
-        <!-- Botón de carrito flotante (arriba a la derecha) -->
-        <button onclick="toggleCart(true)" class="fixed top-4 right-4 z-[70] bg-white/90 hover:bg-white shadow-lg p-2.5 rounded-full backdrop-blur-md transition-all active:scale-90">
-            <div class="relative">
-                <i data-lucide="shopping-bag" class="text-gray-900 w-6 h-6"></i>
-                <span id="detail-cart-count-badge" class="hidden absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">0</span>
-            </div>
-        </button>
+        <!-- Encabezado corto: flecha para salir + carrito -->
+        <div class="sticky top-0 z-[70] bg-white flex items-center justify-between px-4 py-3 border-b border-gray-100">
+            <button onclick="closeProductDetail()" class="p-2 -ml-2 rounded-full hover:bg-gray-100 transition-all active:scale-90">
+                <i data-lucide="arrow-left" class="text-gray-900 w-6 h-6"></i>
+            </button>
+            <button onclick="toggleCart(true)" class="p-2 -mr-2 rounded-full hover:bg-gray-100 transition-all active:scale-90">
+                <div class="relative">
+                    <i data-lucide="shopping-bag" class="text-gray-900 w-6 h-6"></i>
+                    <span id="detail-cart-count-badge" class="hidden absolute -top-1.5 -right-1.5 bg-emerald-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">0</span>
+                </div>
+            </button>
+        </div>
 
         <!-- Imagen grande arriba -->
-        <div class="w-full h-[42vh] md:h-[55vh] bg-gray-100 relative flex items-center justify-center">
+        <div class="w-full h-[36vh] md:h-[50vh] bg-gray-100 relative flex items-center justify-center">
             <img id="detail-main-image" src="" alt="" class="w-full h-full object-contain mix-blend-multiply transition-all duration-300">
         </div>
 
@@ -272,7 +283,7 @@
                     <p class="text-xs text-emerald-600 mt-1">Elige una opción para continuar</p>
                 </div>
                 <button onclick="closeDeliveryOverlay()" class="p-2 hover:bg-white rounded-full transition-colors text-gray-500 flex-shrink-0">
-                    <i data-lucide="x"></i>
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
                 </button>
             </div>
 
@@ -848,17 +859,57 @@
         function updateDetailCartBadge() {
             const badge = document.getElementById('detail-cart-count-badge');
             if (!badge) return;
-            if (cart.length > 0) { badge.textContent = cart.length; badge.classList.remove('hidden'); }
+            if (cartCount() > 0) { badge.textContent = cartCount(); badge.classList.remove('hidden'); }
             else { badge.classList.add('hidden'); }
         }
         function toggleCart(show) { const modal = document.getElementById('cart-modal'); if (show) { modal.classList.remove('hidden'); renderCart(); } else { modal.classList.add('hidden'); } }
-        function addToCart(productId) { const product = products.find(p => p.id === productId); if (product) { cart.push(product); updateCartBadge(); updateDetailCartBadge(); renderCart(); toggleCart(true); } }
+        function cartCount() { return cart.reduce((acc, item) => acc + item.qty, 0); }
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === productId);
+            if (existing) { existing.qty += 1; }
+            else { cart.push({ ...product, qty: 1 }); }
+            updateCartBadge(); updateDetailCartBadge(); renderCart(); toggleCart(true);
+        }
         function removeFromCart(index) { cart.splice(index, 1); updateCartBadge(); updateDetailCartBadge(); renderCart(); }
-        function updateCartBadge() { const badge = document.getElementById('cart-count-badge'); if (cart.length > 0) { badge.textContent = cart.length; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
+        function incrementCartItem(index) { cart[index].qty += 1; updateCartBadge(); updateDetailCartBadge(); renderCart(); }
+        function decrementCartItem(index) {
+            cart[index].qty -= 1;
+            if (cart[index].qty <= 0) { cart.splice(index, 1); }
+            updateCartBadge(); updateDetailCartBadge(); renderCart();
+        }
+        function updateCartBadge() { const badge = document.getElementById('cart-count-badge'); if (cartCount() > 0) { badge.textContent = cartCount(); badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); } }
         function renderCart() { 
             const container = document.getElementById('cart-items-container'); const footer = document.getElementById('cart-footer'); const totalEl = document.getElementById('cart-total');
             if (cart.length === 0) { container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4"><div class="bg-gray-100 p-6 rounded-full"><i data-lucide="clipboard-list" class="w-12 h-12 text-gray-300"></i></div><div class="text-center"><p class="text-lg font-medium text-gray-600">Tu lista está vacía</p><p class="text-sm">Selecciona productos para armar tu pedido.</p></div><button onclick="toggleCart(false)" class="text-emerald-600 font-bold hover:underline text-sm mt-4">Volver al catálogo</button></div>`; footer.classList.add('hidden'); } 
-            else { container.innerHTML = cart.map((item, index) => `<div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-xl items-center shadow-sm hover:shadow-md transition-shadow"><img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg bg-gray-100"><div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 text-sm truncate">${item.name}</h4><p class="text-xs text-gray-500">${item.category}</p><p class="text-emerald-600 font-bold mt-0.5">$${item.price}</p></div><button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join(''); const total = cart.reduce((acc, item) => acc + item.price, 0); totalEl.textContent = `$${total}`; footer.classList.remove('hidden'); }
+            else {
+                container.innerHTML = cart.map((item, index) => `
+                    <div class="flex gap-4 p-3 bg-white border border-gray-100 rounded-xl items-center shadow-sm hover:shadow-md transition-shadow">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 text-sm truncate">${item.name}</h4>
+                            <p class="text-xs text-gray-500">${item.category}</p>
+                            <p class="text-emerald-600 font-bold mt-0.5">$${(item.price * item.qty).toFixed(0)}</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button onclick="decrementCartItem(${index})" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                                <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <span class="w-6 text-center font-bold text-gray-800 text-sm">${item.qty}</span>
+                            <button onclick="incrementCartItem(${index})" class="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors flex-shrink-0">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                `).join('');
+                const total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                totalEl.textContent = `$${total.toFixed(0)}`;
+                footer.classList.remove('hidden');
+            }
             lucide.createIcons();
         }
         function setCategory(name) { activeCategory = name; renderCategories(); renderProducts(); document.getElementById('category-title').scrollIntoView({ behavior: 'smooth' }); }
@@ -918,7 +969,7 @@
             // Devuelve la lista de productos a incluir en el mensaje, según el contexto
             if (deliveryContext === 'single') {
                 const product = products.find(p => p.id === deliveryProductId);
-                return product ? [product] : [];
+                return product ? [{ ...product, qty: 1 }] : [];
             }
             return cart;
         }
@@ -928,9 +979,9 @@
             if (itemsList.length === 0) { closeDeliveryOverlay(); return; }
 
             let message = "Hola, me interesa consultar los siguientes productos:\n\n";
-            itemsList.forEach((item) => { message += `▪️ ${item.name} - $${item.price}\n`; });
-            const total = itemsList.reduce((acc, item) => acc + item.price, 0);
-            message += `\n💰 *Total Estimado: $${total}*\n`;
+            itemsList.forEach((item) => { message += `- ${item.name} x${item.qty} - $${(item.price * item.qty).toFixed(0)}\n`; });
+            const total = itemsList.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            message += `\nTotal Estimado: $${total.toFixed(0)}\n`;
 
             if (method === 'pickup') {
                 const nombre = document.getElementById('pickup-nombre').value.trim();
@@ -943,11 +994,11 @@
                     return;
                 }
 
-                message += `\n📦 *Método: Pick Up*\n`;
-                message += `👤 Nombre: ${nombre}\n`;
-                message += `📱 Teléfono: ${telefono}\n`;
-                if (fecha) message += `📅 Fecha: ${fecha}\n`;
-                message += `📍 Punto de entrega: ${lugar}\n`;
+                message += `\nMétodo: Pick Up\n`;
+                message += `Nombre: ${nombre}\n`;
+                message += `Teléfono: ${telefono}\n`;
+                if (fecha) message += `Fecha: ${fecha}\n`;
+                message += `Punto de entrega: ${lugar}\n`;
 
             } else if (method === 'envio') {
                 const nombre = document.getElementById('envio-nombre').value.trim();
@@ -962,13 +1013,13 @@
                     return;
                 }
 
-                message += `\n🚚 *Método: Envío*\n`;
-                message += `👤 Nombre: ${nombre}\n`;
-                message += `🏠 Dirección: ${direccion}\n`;
-                message += `🛣️ Calle: ${calle}\n`;
-                message += `🔢 Número: ${numero}\n`;
-                message += `📱 Teléfono: ${telefono}\n`;
-                if (referencias) message += `📝 Referencias: ${referencias}\n`;
+                message += `\nMétodo: Envío\n`;
+                message += `Nombre: ${nombre}\n`;
+                message += `Dirección: ${direccion}\n`;
+                message += `Calle: ${calle}\n`;
+                message += `Número: ${numero}\n`;
+                message += `Teléfono: ${telefono}\n`;
+                if (referencias) message += `Referencias: ${referencias}\n`;
             }
 
             message += `\nQuedo atento a la disponibilidad.`;
