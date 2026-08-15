@@ -232,8 +232,8 @@
 
     <!-- SECCIÓN DE MARCA: difuminado corto + barra "Descubre más" + panel que se revela con 3 intentos de scroll -->
     <section class="relative">
-        <!-- Difuminado: corto y en flujo normal (ya no sticky), va arriba de la barra -->
-        <div class="h-16 md:h-24 bg-gradient-to-b from-white to-[#111827]"></div>
+        <!-- Difuminado tipo grid de partículas (reemplaza el degradado CSS), corto y en flujo normal -->
+        <canvas id="brand-fade-canvas" class="block w-full h-32 md:h-48"></canvas>
 
         <!-- Rectángulo horizontal sólido: aquí viven el texto y la flechita -->
         <div id="discover-bar" class="bg-[#111827] flex flex-col items-center justify-center gap-2 py-8 md:py-10">
@@ -710,9 +710,118 @@
             }, { passive: true });
         }
 
+        // ============================================================
+        // DIFUMINADO DE PARTÍCULAS: grid de cuadros que aparecen más
+        // densos hacia abajo y titilan de brillo (reemplaza el degradado CSS)
+        // ============================================================
+        function initBrandFadeCanvas() {
+            const canvas = document.getElementById('brand-fade-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const CONFIG = {
+                gridSize: 100,          // columnas a lo ancho
+                squareSize: 0.77,       // tamaño del cuadro relativo a su celda
+                fadeStart: 0.33,        // fracción vertical donde empiezan a aparecer
+                fadeEnd: 1.00,          // fracción vertical de densidad máxima (abajo)
+                falloff: 2.25,          // curva de aceleración del fade
+                minBrightness: 0.19,    // brillo mínimo de un cuadro visible
+                twinkleSpeed: 1.60,     // velocidad del parpadeo
+                twinkleStrength: 0.94,  // cuánto varía el brillo al parpadear
+                intensity: 1.10,        // multiplicador general de brillo
+                opacity: 1.00,          // opacidad global
+                squareColorRgb: '17, 24, 39', // #111827
+                background: '#ffffff'
+            };
+
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+            let cellSize = 0, cols = 0, rows = 0;
+            let squares = [];
+            let rafId = null;
+            let resizeTimeout = null;
+
+            function buildGrid() {
+                const rect = canvas.getBoundingClientRect();
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.round(rect.width * dpr);
+                canvas.height = Math.round(rect.height * dpr);
+
+                cellSize = rect.width / CONFIG.gridSize;
+                cols = CONFIG.gridSize;
+                rows = Math.max(1, Math.round(rect.height / cellSize));
+
+                squares = [];
+                for (let r = 0; r < rows; r++) {
+                    const fraction = rows > 1 ? r / (rows - 1) : 1; // 0 arriba, 1 abajo
+                    let t = (fraction - CONFIG.fadeStart) / (CONFIG.fadeEnd - CONFIG.fadeStart);
+                    t = Math.min(1, Math.max(0, t));
+                    const density = Math.pow(t, CONFIG.falloff);
+
+                    for (let c = 0; c < cols; c++) {
+                        if (Math.random() >= density) continue; // no todas las celdas tienen cuadro
+                        squares.push({
+                            row: r,
+                            col: c,
+                            seed: Math.random() * Math.PI * 2,
+                            speedVariance: 0.7 + Math.random() * 0.6,
+                            staticBrightness: CONFIG.minBrightness + Math.random() * CONFIG.twinkleStrength
+                        });
+                    }
+                }
+            }
+
+            function render(timeMs) {
+                const rect = canvas.getBoundingClientRect();
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.fillStyle = CONFIG.background;
+                ctx.fillRect(0, 0, rect.width, rect.height);
+
+                const t = (timeMs || 0) * 0.001 * CONFIG.twinkleSpeed;
+                const size = cellSize * CONFIG.squareSize;
+                const gap = (cellSize - size) / 2;
+
+                for (let i = 0; i < squares.length; i++) {
+                    const sq = squares[i];
+                    let brightness;
+                    if (reduceMotion) {
+                        brightness = sq.staticBrightness;
+                    } else {
+                        const twinkle = (Math.sin(t * sq.speedVariance + sq.seed) + 1) / 2; // 0..1
+                        brightness = CONFIG.minBrightness + twinkle * CONFIG.twinkleStrength;
+                    }
+                    brightness = Math.min(1, brightness * CONFIG.intensity);
+                    const alpha = brightness * CONFIG.opacity;
+
+                    ctx.fillStyle = `rgba(${CONFIG.squareColorRgb}, ${alpha.toFixed(3)})`;
+                    ctx.fillRect(sq.col * cellSize + gap, sq.row * cellSize + gap, size, size);
+                }
+
+                if (!reduceMotion) rafId = requestAnimationFrame(render);
+            }
+
+            function start() {
+                buildGrid();
+                if (rafId) cancelAnimationFrame(rafId);
+                if (reduceMotion) render(0);
+                else rafId = requestAnimationFrame(render);
+            }
+
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(start, 150);
+            });
+
+            start();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Manejo del Preloader Cinético
             initKineticPreloader();
+
+            // Difuminado de partículas de la sección de marca
+            initBrandFadeCanvas();
 
             // "Descubre más de nosotros": tope + revelado tras 3 intentos de scroll
             initBrandRevealGate();
