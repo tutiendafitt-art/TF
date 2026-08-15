@@ -14,6 +14,9 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- GSAP (anima la secuencia cinética del preloader) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
     <!-- Google Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
@@ -81,15 +84,87 @@
                 font-size: 14px;
             }
         }
+
+        /* ============================================================
+           PRELOADER CINÉTICO — "Empieza. Crece. Vive." + Logo
+           Fondo blanco puro, tipografía grotesca (Inter 900) en #111827.
+           ============================================================ */
+        :root{
+            --tf-ink: #111827;
+            --tf-emerald-dim: rgba(16, 185, 129, .35);
+        }
+        #preloader{
+            will-change: opacity;
+        }
+        .kinetic-stage{
+            position: relative;
+            width: 100%;
+            height: clamp(90px, 16vw, 150px);
+            padding: 0 5vw;
+        }
+        /* Las 3 palabras se apilan en el mismo lugar del stage;
+           solo se ve la que su propia animación revela. */
+        .kinetic-word{
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            white-space: nowrap;
+        }
+        .kinetic-word .letter{
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 10.5vw, 6.25rem);
+            line-height: 1;
+            color: var(--tf-ink);
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(44px);
+            will-change: transform, opacity;
+        }
+        .logo-stage{
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0;
+            transform: translateY(44px);
+            will-change: transform, opacity;
+        }
+        .logo-stage img{
+            width: min(140px, 28vw);
+            height: min(140px, 28vw);
+            object-fit: contain;
+            filter: drop-shadow(0 0 24px var(--tf-emerald-dim));
+        }
+        .logo-stage .logo-fallback{
+            display: none;
+            align-items: center; justify-content: center;
+            width: min(140px, 28vw); height: min(140px, 28vw);
+            border-radius: 999px;
+            background: radial-gradient(circle at 35% 30%, #16C98C, #0E9C6D);
+            color: #fff; font-weight: 900; font-size: 1.6rem; letter-spacing: -0.02em;
+        }
+        @media (prefers-reduced-motion: reduce){
+            .kinetic-word .letter, .logo-stage{ transition: none; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 relative">
 
-    <!-- SPLASH SCREEN (PANTALLA DE CARGA) -->
-    <div id="splash-screen" class="fixed inset-0 z-[100] bg-white flex items-center justify-center transition-opacity duration-700 ease-out">
-        <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr" 
-             alt="Cargando..." 
-             class="w-64 h-64 md:w-96 md:h-96 object-contain">
+    <!-- PRELOADER CINÉTICO (PANTALLA DE CARGA) -->
+    <div id="preloader" class="fixed inset-0 z-[100] bg-white flex items-center justify-center overflow-hidden">
+        <div class="kinetic-stage" id="kinetic-stage">
+            <div class="kinetic-word" id="word-1" data-word="EMPIEZA"></div>
+            <div class="kinetic-word" id="word-2" data-word="CRECE"></div>
+            <div class="kinetic-word" id="word-3" data-word="VIVE"></div>
+
+            <!-- Paso final: el logo actual del sitio -->
+            <div class="logo-stage" id="logo-stage">
+                <img src="https://lh3.googleusercontent.com/d/1tdvYHJFIakaQtRiezTPqsU0FAKSmjQgr"
+                     alt="Tienda Fit"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="logo-fallback">TF</div>
+            </div>
+        </div>
     </div>
 
     <!-- Navbar Principal -->
@@ -420,15 +495,116 @@
         let deliveryProductId = null; // id del producto si el contexto es 'single'
         let deliveryMethod = null; // 'pickup' | 'envio'
 
+        // ============================================================
+        // PRELOADER CINÉTICO — "Empieza. Crece. Vive." + Logo
+        // ============================================================
+        function initKineticPreloader() {
+            const SESSION_KEY = 'tiendafit_preloader_seen';
+            const preloader   = document.getElementById('preloader');
+            const stage       = document.getElementById('kinetic-stage');
+            const logoStage   = document.getElementById('logo-stage');
+            let revealed      = false;
+
+            if (!preloader || !stage) return;
+
+            // 1. Construir cada letra en su propio <span> (una vez, para las 3 palabras)
+            const wordEls = Array.prototype.slice.call(stage.querySelectorAll('.kinetic-word'));
+            const words = wordEls.map((el) => {
+                const letters = el.dataset.word.split('').map((ch) => {
+                    const span = document.createElement('span');
+                    span.className = 'letter';
+                    span.textContent = ch;
+                    el.appendChild(span);
+                    return span;
+                });
+                return { el, letters };
+            });
+
+            // 2. Ocultar el preloader: fade a opacity 0 y luego display:none,
+            //    para no interferir con la navegación ni los eventos del sitio.
+            function hidePreloader() {
+                if (revealed) return;
+                revealed = true;
+                document.body.style.overflow = '';
+
+                if (window.gsap) {
+                    gsap.to(preloader, {
+                        opacity: 0,
+                        duration: 0.6,
+                        ease: 'power2.inOut',
+                        onComplete: () => { preloader.style.display = 'none'; }
+                    });
+                } else {
+                    preloader.style.transition = 'opacity .5s ease';
+                    preloader.style.opacity = '0';
+                    setTimeout(() => { preloader.style.display = 'none'; }, 500);
+                }
+            }
+
+            const alreadySeen  = sessionStorage.getItem(SESSION_KEY);
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // Visitas repetidas en la misma sesión, o si GSAP no cargó: directo a la tienda.
+            if (alreadySeen || !window.gsap) {
+                hidePreloader();
+                return;
+            }
+
+            sessionStorage.setItem(SESSION_KEY, '1');
+            document.body.style.overflow = 'hidden';
+            // Red de seguridad: si algo falla a medio camino, nunca dejamos al
+            // usuario atrapado detrás del preloader.
+            const safety = setTimeout(hidePreloader, 9000);
+
+            // 3. Modo "movimiento reducido": mismo resultado, sin la coreografía.
+            if (reduceMotion) {
+                gsap.timeline({ onComplete: () => { clearTimeout(safety); hidePreloader(); } })
+                    .to(logoStage, { opacity: 1, y: 0, duration: 0.5 })
+                    .to({}, { duration: 0.6 }); // sostenido breve para fijar la marca
+                return;
+            }
+
+            // 4. Coreografía tipográfica cinética
+            const STAGGER     = 0.04;   // separación entre letras al entrar
+            const OUT_STAGGER = 0.032;  // separación entre letras al salir
+            const IN_DUR      = 0.5;
+            const OUT_DUR     = 0.34;
+            const HOLD        = 0.22;   // pausa breve para "leer" la palabra
+            const OVERLAP     = 0.08;   // solape entre palabras
+            const EASE_IN     = 'power3.out';
+            const EASE_OUT    = 'power2.in';
+
+            const [w1, w2, w3] = words.map((w) => w.letters); // EMPIEZA, CRECE, VIVE
+
+            const tl = gsap.timeline({
+                onComplete: () => { clearTimeout(safety); hidePreloader(); }
+            });
+
+            // --- EMPIEZA: cascada izquierda -> derecha, sale desde la última letra ---
+            tl.to(w1, { opacity: 1, y: 0, duration: IN_DUR, ease: EASE_IN,
+                        stagger: { each: STAGGER, from: 'start' } });
+            tl.to(w1, { opacity: 0, y: -44, duration: OUT_DUR, ease: EASE_OUT,
+                        stagger: { each: OUT_STAGGER, from: 'end' } }, '+=' + HOLD);
+
+            // --- CRECE: dominó derecha -> izquierda, sale desde la primera letra ---
+            tl.to(w2, { opacity: 1, y: 0, duration: IN_DUR, ease: EASE_IN,
+                        stagger: { each: STAGGER, from: 'end' } }, '-=' + OVERLAP);
+            tl.to(w2, { opacity: 0, y: -44, duration: OUT_DUR, ease: EASE_OUT,
+                        stagger: { each: OUT_STAGGER, from: 'start' } }, '+=' + HOLD);
+
+            // --- VIVE: cascada izquierda -> derecha, sale toda junta ---
+            tl.to(w3, { opacity: 1, y: 0, duration: IN_DUR, ease: EASE_IN,
+                        stagger: { each: STAGGER, from: 'start' } }, '-=' + OVERLAP);
+            tl.to(w3, { opacity: 0, y: -44, duration: OUT_DUR, ease: EASE_OUT }, '+=' + HOLD);
+
+            // --- Logo actual del sitio: paso final antes de desvanecer ---
+            tl.to(logoStage, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, '-=0.05');
+            tl.to({}, { duration: 0.6 }); // sostenido breve para fijar la marca
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Manejo del Splash Screen
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0'; // Desvanece
-                setTimeout(() => {
-                    splash.style.display = 'none'; // Quita del flujo
-                }, 700); // Espera a que termine la transición de opacidad
-            }, 1500); // Muestra por 1.5 segundos (Antes 2.5)
+            // Manejo del Preloader Cinético
+            initKineticPreloader();
 
             // Cargar datos en paralelo
             Promise.all([
