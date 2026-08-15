@@ -230,19 +230,21 @@
         <div id="products-container" class="space-y-8 md:space-y-12"></div>
     </main>
 
-    <!-- SECCIÓN DE MARCA: difuminado + revelado al hacer scroll (reemplaza el footer plano) -->
+    <!-- SECCIÓN DE MARCA: difuminado corto + barra "Descubre más" + panel que se revela con 3 intentos de scroll -->
     <section class="relative">
-        <!-- "Tope": queda fijo mientras el panel de abajo sube y lo cubre -->
-        <div class="sticky top-[64px] md:top-[72px] h-[52vh] md:h-[62vh] z-0 flex items-end justify-center pb-10 md:pb-14 bg-gradient-to-b from-white via-white to-[#111827]">
-            <div class="flex flex-col items-center gap-2">
-                <span class="text-[11px] md:text-xs font-bold tracking-[0.3em] uppercase text-gray-400">Tienda Fit</span>
-                <span class="text-lg md:text-2xl font-extrabold text-gray-900">Descubre más de nosotros</span>
-                <i data-lucide="chevron-down" class="w-5 h-5 md:w-6 md:h-6 text-gray-400 animate-bounce mt-1"></i>
-            </div>
+        <!-- Difuminado: corto y en flujo normal (ya no sticky), va arriba de la barra -->
+        <div class="h-16 md:h-24 bg-gradient-to-b from-white to-[#111827]"></div>
+
+        <!-- Rectángulo horizontal sólido: aquí viven el texto y la flechita -->
+        <div id="discover-bar" class="bg-[#111827] flex flex-col items-center justify-center gap-2 py-8 md:py-10">
+            <span class="text-[11px] md:text-xs font-bold tracking-[0.3em] uppercase text-emerald-400">Tienda Fit</span>
+            <span class="text-lg md:text-2xl font-extrabold text-white">Descubre más de nosotros</span>
+            <i data-lucide="chevron-down" class="w-5 h-5 md:w-6 md:h-6 text-gray-400 animate-bounce mt-1"></i>
         </div>
 
-        <!-- Panel de marca/visión: sube y cubre, como si se desbloqueara otra página -->
-        <div class="relative z-10 bg-[#111827] text-white rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-30px_60px_-20px_rgba(0,0,0,0.45)] px-6 md:px-16 pt-14 md:pt-20 pb-10">
+        <!-- Panel de marca/visión: colapsado; se despliega como continuación de la misma página, sin esquinas redondeadas -->
+        <div id="brand-reveal-panel" class="relative bg-[#111827] text-white px-6 md:px-16 overflow-hidden max-h-0 transition-[max-height] duration-700 ease-in-out">
+            <div class="pt-14 md:pt-20 pb-10">
 
             <div class="max-w-3xl mx-auto text-center mb-12 md:mb-20">
                 <span class="text-emerald-400 text-xs md:text-sm font-bold tracking-[0.25em] uppercase">Nuestra visión</span>
@@ -301,6 +303,7 @@
                     </div>
                 </div>
                 <p class="text-gray-500 text-xs md:text-sm text-center border-t border-white/10 pt-8">© 2026 Tienda Fit.</p>
+            </div>
             </div>
         </div>
     </section>
@@ -646,9 +649,73 @@
             tl.to({}, { duration: 0.6 }); // sostenido breve para fijar la marca
         }
 
+        // ============================================================
+        // "DESCUBRE MÁS": el scroll se detiene solo en la barra (como
+        // fin de página) y se necesitan 3 intentos más hacia abajo
+        // para que el panel de marca se despliegue.
+        // ============================================================
+        function initBrandRevealGate() {
+            const panel = document.getElementById('brand-reveal-panel');
+            if (!panel) return;
+
+            const REQUIRED_ATTEMPTS = 3;
+            const BOTTOM_BUFFER = 4; // margen por redondeos de subpíxel
+            let attempts = 0;
+            let revealed = false;
+            let touchStartY = 0;
+
+            function isAtBottom() {
+                return (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - BOTTOM_BUFFER);
+            }
+
+            function reveal() {
+                if (revealed) return;
+                revealed = true;
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.addEventListener('transitionend', function onEnd(e) {
+                    if (e.propertyName !== 'max-height') return;
+                    panel.style.maxHeight = 'none'; // libre para futuros cambios de contenido/tamaño
+                    panel.removeEventListener('transitionend', onEnd);
+                });
+            }
+
+            // --- Escritorio / trackpad ---
+            window.addEventListener('wheel', (e) => {
+                if (revealed) return;
+                if (!isAtBottom()) { attempts = 0; return; }
+                if (e.deltaY > 0) {
+                    attempts++;
+                    if (attempts >= REQUIRED_ATTEMPTS) reveal();
+                } else if (e.deltaY < 0) {
+                    attempts = 0;
+                }
+            }, { passive: true });
+
+            // --- Móvil (swipe) ---
+            window.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            window.addEventListener('touchend', (e) => {
+                if (revealed) return;
+                if (!isAtBottom()) { attempts = 0; return; }
+                const deltaY = touchStartY - e.changedTouches[0].clientY; // positivo = dedo sube (intenta bajar la página)
+                const THRESHOLD = 24;
+                if (deltaY > THRESHOLD) {
+                    attempts++;
+                    if (attempts >= REQUIRED_ATTEMPTS) reveal();
+                } else if (deltaY < -THRESHOLD) {
+                    attempts = 0;
+                }
+            }, { passive: true });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Manejo del Preloader Cinético
             initKineticPreloader();
+
+            // "Descubre más de nosotros": tope + revelado tras 3 intentos de scroll
+            initBrandRevealGate();
 
             // Cargar datos en paralelo
             Promise.all([
