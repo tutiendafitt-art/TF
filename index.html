@@ -91,7 +91,6 @@
            ============================================================ */
         :root{
             --tf-ink: #111827;
-            --tf-emerald-dim: rgba(16, 185, 129, .35);
         }
         #preloader{
             will-change: opacity;
@@ -113,7 +112,7 @@
             display: inline-block;
             font-family: 'Inter', sans-serif;
             font-weight: 900;
-            font-size: clamp(2.5rem, 10.5vw, 6.25rem);
+            font-size: clamp(2.9rem, 12.5vw, 7.5rem);
             line-height: 1;
             color: var(--tf-ink);
             letter-spacing: -0.03em;
@@ -130,18 +129,17 @@
             will-change: transform, opacity;
         }
         .logo-stage img{
-            width: min(140px, 28vw);
-            height: min(140px, 28vw);
+            width: min(105px, 20vw);
+            height: min(105px, 20vw);
             object-fit: contain;
-            filter: drop-shadow(0 0 24px var(--tf-emerald-dim));
         }
         .logo-stage .logo-fallback{
             display: none;
             align-items: center; justify-content: center;
-            width: min(140px, 28vw); height: min(140px, 28vw);
+            width: min(105px, 20vw); height: min(105px, 20vw);
             border-radius: 999px;
-            background: radial-gradient(circle at 35% 30%, #16C98C, #0E9C6D);
-            color: #fff; font-weight: 900; font-size: 1.6rem; letter-spacing: -0.02em;
+            background: #111827;
+            color: #fff; font-weight: 900; font-size: 1.3rem; letter-spacing: -0.02em;
         }
         @media (prefers-reduced-motion: reduce){
             .kinetic-word .letter, .logo-stage{ transition: none; }
