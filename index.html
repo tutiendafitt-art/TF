@@ -98,7 +98,7 @@
         .kinetic-stage{
             position: relative;
             width: 100%;
-            height: clamp(90px, 16vw, 150px);
+            height: clamp(120px, 24vw, 280px);
             padding: 0 5vw;
         }
         /* Las 3 palabras se apilan en el mismo lugar del stage;
@@ -112,7 +112,7 @@
             display: inline-block;
             font-family: 'Inter', sans-serif;
             font-weight: 900;
-            font-size: clamp(2.9rem, 12.5vw, 7.5rem);
+            font-size: clamp(4rem, 20vw, 14rem);
             line-height: 1;
             color: var(--tf-ink);
             letter-spacing: -0.03em;
@@ -564,6 +564,43 @@
                 });
                 return { el, letters };
             });
+
+            // 1.b Calcular el tamaño más grande posible que quepa en pantalla,
+            //     usando la palabra más larga (EMPIEZA) como referencia, y
+            //     aplicar ese mismo tamaño a las 3 palabras para que la
+            //     secuencia se vea consistente. Esto reemplaza un tamaño fijo
+            //     por uno que siempre es "lo más grande posible sin recortarse".
+            (function sizeKineticWords() {
+                const PROBE = 100; // px, tamaño de referencia para medir proporciones
+                const longestWord = words.reduce((a, b) =>
+                    b.el.dataset.word.length > a.el.dataset.word.length ? b : a
+                );
+
+                const probeEl = document.createElement('span');
+                probeEl.style.cssText = [
+                    'position:absolute', 'visibility:hidden', 'white-space:nowrap',
+                    "font-family:'Inter',sans-serif", 'font-weight:900',
+                    'letter-spacing:-0.03em', 'text-transform:uppercase',
+                    'font-size:' + PROBE + 'px'
+                ].join(';');
+                probeEl.textContent = longestWord.el.dataset.word;
+                document.body.appendChild(probeEl);
+                const naturalWidthAtProbe = probeEl.scrollWidth;
+                document.body.removeChild(probeEl);
+
+                if (!naturalWidthAtProbe) return; // fallback: se queda el tamaño del CSS
+
+                const available = stage.clientWidth * 0.92; // 8% de margen de seguridad
+                let fontSizePx = (available / naturalWidthAtProbe) * PROBE;
+
+                const MIN_PX = 84;   // ~5.25rem, piso para pantallas muy angostas
+                const MAX_PX = 260;  // ~16.25rem, techo para no verse absurdo en monitores grandes
+                fontSizePx = Math.min(MAX_PX, Math.max(MIN_PX, fontSizePx));
+
+                words.forEach((w) => {
+                    w.letters.forEach((l) => { l.style.fontSize = fontSizePx + 'px'; });
+                });
+            })();
 
             // 2. Ocultar el preloader: fade a opacity 0 y luego display:none,
             //    para no interferir con la navegación ni los eventos del sitio.
