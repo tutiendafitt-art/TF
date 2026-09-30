@@ -596,9 +596,19 @@
                 const MIN_PX = 84;   // ~5.25rem, piso para pantallas muy angostas
                 const MAX_PX = 260;  // ~16.25rem, techo para no verse absurdo en monitores grandes
                 fontSizePx = Math.min(MAX_PX, Math.max(MIN_PX, fontSizePx));
+                fontSizePx *= 0.75; // 25% más chico
 
                 words.forEach((w) => {
                     w.letters.forEach((l) => { l.style.fontSize = fontSizePx + 'px'; });
+                });
+
+                // El logo usa exactamente el mismo tamaño que las letras
+                const logoImg = logoStage.querySelector('img');
+                const logoFallback = logoStage.querySelector('.logo-fallback');
+                [logoImg, logoFallback].forEach((elm) => {
+                    if (!elm) return;
+                    elm.style.width = fontSizePx + 'px';
+                    elm.style.height = fontSizePx + 'px';
                 });
             })();
 
