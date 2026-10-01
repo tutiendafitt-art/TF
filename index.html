@@ -602,13 +602,15 @@
                     w.letters.forEach((l) => { l.style.fontSize = fontSizePx + 'px'; });
                 });
 
-                // El logo usa exactamente el mismo tamaño que las letras
+                // El logo mide el doble que las letras, con un tope de seguridad
+                // para que nunca se salga de pantalla en viewports inusuales.
+                const logoSizePx = Math.min(fontSizePx * 2, window.innerWidth * 0.6, window.innerHeight * 0.5);
                 const logoImg = logoStage.querySelector('img');
                 const logoFallback = logoStage.querySelector('.logo-fallback');
                 [logoImg, logoFallback].forEach((elm) => {
                     if (!elm) return;
-                    elm.style.width = fontSizePx + 'px';
-                    elm.style.height = fontSizePx + 'px';
+                    elm.style.width = logoSizePx + 'px';
+                    elm.style.height = logoSizePx + 'px';
                 });
             })();
 
